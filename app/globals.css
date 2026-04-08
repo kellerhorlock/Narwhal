@@ -1,26 +1,55 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: #060a12;
+  --color-foreground: #f0f0f5;
+  --color-muted: #42424f;
+  --color-accent: #38ef7d;
+  --color-card: rgba(100, 160, 255, 0.03);
+  --color-card-hover: rgba(100, 160, 255, 0.05);
+  --color-border: rgba(100, 160, 255, 0.06);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains);
+  --font-serif: var(--font-playfair);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --bg-primary: #060a12;
+  --bg-sidebar: rgba(8, 14, 24, 0.98);
+  --bg-card: rgba(100, 160, 255, 0.03);
+  --bg-card-hover: rgba(100, 160, 255, 0.05);
+  --border-subtle: rgba(100, 160, 255, 0.06);
+  --border-medium: rgba(100, 160, 255, 0.1);
+  --accent-green: #38ef7d;
+  --accent-blue: rgba(100, 160, 255, 0.08);
+  --accent-blue-active: rgba(100, 180, 255, 0.08);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-primary);
+  color: #f0f0f5;
+}
+
+/* Thin subtle scrollbar — arctic tint */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 160, 255, 0.08);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 160, 255, 0.14);
+}
+
+/* Narwhal float animation for empty states */
+@keyframes narwhal-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.animate-narwhal-float {
+  animation: narwhal-float 3s ease-in-out infinite;
 }

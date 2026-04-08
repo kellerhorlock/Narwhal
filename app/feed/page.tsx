@@ -1,0 +1,370 @@
+"use client";
+
+import { useEffect, useState, useCallback, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase";
+import Sidebar from "@/components/Sidebar";
+import FeedItem from "@/components/FeedItem";
+import NewsCard from "@/components/NewsCard";
+import DailyBriefing from "@/components/DailyBriefing";
+import EmptyState from "@/components/EmptyState";
+import ProjectDetail from "@/components/ProjectDetail";
+import ProfileView from "@/components/ProfileView";
+import SearchView from "@/components/SearchView";
+import LeaderboardView from "@/components/LeaderboardView";
+import SetupView from "@/components/SetupView";
+import { newsFeed as fallbackNews } from "@/lib/ai-news-feed";
+import type { NewsEntry } from "@/lib/ai-news-feed";
+import type { Profile, Project } from "@/lib/types";
+import { Star } from "lucide-react";
+import Avatar from "@/components/Avatar";
+import ProjectCard from "@/components/ProjectCard";
+import { timeAgo } from "@/lib/helpers";
+
+type Tab = "feed" | "search" | "leaderboard" | "profile" | "setup";
+type FeedFilter = "all" | "following";
+
+interface ViewState {
+  tab: Tab;
+  projectDetail?: { project: Project; profile: Profile };
+  viewUsername?: string;
+}
+
+type FeedEntry =
+  | { kind: "project"; project: Project & { profiles: Profile } }
+  | { kind: "featured"; project: Project & { profiles: Profile } }
+  | { kind: "news"; entry: NewsEntry };
+
+export default function FeedPage() {
+  const router = useRouter();
+  const [currentUser, setCurrentUser] = useState<Profile | null>(null);
+  const [currentUserId, setCurrentUserId] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const [view, setView] = useState<ViewState>({ tab: "feed" });
+  const [feedFilter, setFeedFilter] = useState<FeedFilter>("all");
+  const [feedProjects, setFeedProjects] = useState<(Project & { profiles: Profile })[]>([]);
+  const [featuredProjects, setFeaturedProjects] = useState<(Project & { profiles: Profile })[]>([]);
+  const [allUsers, setAllUsers] = useState<Profile[]>([]);
+  const [allDownloads, setAllDownloads] = useState<number[]>([]);
+  const [userPublishedCount, setUserPublishedCount] = useState(0);
+  const [userTotalDownloads, setUserTotalDownloads] = useState(0);
+  const [newsEntries, setNewsEntries] = useState<NewsEntry[]>(fallbackNews);
+  const [feedLoading, setFeedLoading] = useState(true);
+
+  // Fetch live news
+  useEffect(() => {
+    async function loadNews() {
+      try {
+        const res = await fetch("/api/news");
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setNewsEntries(data as NewsEntry[]);
+          }
+        }
+      } catch {
+        // Fallback already set
+      }
+    }
+    loadNews();
+  }, []);
+
+  // Auth check
+  useEffect(() => {
+    async function checkAuth() {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        router.push("/login");
+        return;
+      }
+      setCurrentUserId(user.id);
+
+      const [{ data: profile }, { count: projectCount }] = await Promise.all([
+        supabase.from("profiles").select("*").eq("id", user.id).single(),
+        supabase.from("projects").select("*", { count: "exact", head: true }).eq("user_id", user.id),
+      ]);
+
+      if (projectCount === 0) {
+        setCurrentUser(profile);
+        setLoading(false);
+        setView({ tab: "setup" });
+        return;
+      }
+
+      setCurrentUser(profile);
+      setLoading(false);
+    }
+    checkAuth();
+  }, [router]);
+
+  // Load feed data
+  useEffect(() => {
+    if (!currentUserId) return;
+    async function loadFeed() {
+      setFeedLoading(true);
+      const supabase = createClient();
+
+      const [{ data: projectsData }, { data: usersData }, { data: userProjects }, { data: topProjects }] = await Promise.all([
+        supabase
+          .from("projects")
+          .select("*, profiles(*)")
+          .eq("status", "published")
+          .order("last_activity", { ascending: false })
+          .limit(50),
+        supabase.from("profiles").select("*").order("tokens_today", { ascending: false }),
+        supabase.from("projects").select("status, downloads, user_id"),
+        // Featured projects: most downloads/commits for new user discovery
+        supabase
+          .from("projects")
+          .select("*, profiles(*)")
+          .eq("status", "published")
+          .order("downloads", { ascending: false })
+          .limit(6),
+      ]);
+
+      setFeedProjects((projectsData || []) as (Project & { profiles: Profile })[]);
+      setFeaturedProjects((topProjects || []) as (Project & { profiles: Profile })[]);
+      setAllUsers(usersData || []);
+
+      const myProjects = (userProjects || []).filter((p) => p.user_id === currentUserId);
+      setUserPublishedCount(myProjects.filter((p) => p.status === "published").length);
+      setUserTotalDownloads(myProjects.reduce((s, p) => s + (p.downloads || 0), 0));
+      setAllDownloads((userProjects || []).map((p) => p.downloads || 0));
+
+      setFeedLoading(false);
+    }
+    loadFeed();
+  }, [currentUserId]);
+
+  // Build merged feed
+  const mergedFeed = useMemo((): FeedEntry[] => {
+    if (feedFilter === "following") {
+      // Following tab: projects only, no news
+      return feedProjects.map((p) => ({ kind: "project" as const, project: p }));
+    }
+
+    // "All" tab: interleave news with projects
+    const hasProjects = feedProjects.length > 0;
+    const entries: FeedEntry[] = [];
+
+    if (hasProjects) {
+      // Interleave: every 2-3 projects, insert 1 news card
+      let newsIndex = 0;
+      for (let i = 0; i < feedProjects.length; i++) {
+        entries.push({ kind: "project", project: feedProjects[i] });
+        // After every 2nd project (index 1, 3, 5...), insert news
+        if ((i + 1) % 2 === 0 && newsIndex < newsEntries.length) {
+          entries.push({ kind: "news", entry: newsEntries[newsIndex] });
+          newsIndex++;
+        }
+      }
+      // Append remaining news at the end
+      while (newsIndex < newsEntries.length) {
+        entries.push({ kind: "news", entry: newsEntries[newsIndex] });
+        newsIndex++;
+      }
+    } else {
+      // New user / no projects: mostly news, with featured projects mixed in
+      let featIndex = 0;
+      for (let i = 0; i < newsEntries.length; i++) {
+        entries.push({ kind: "news", entry: newsEntries[i] });
+        // After every 3rd news item, insert a featured project
+        if ((i + 1) % 3 === 0 && featIndex < featuredProjects.length) {
+          entries.push({ kind: "featured", project: featuredProjects[featIndex] });
+          featIndex++;
+        }
+      }
+    }
+
+    return entries;
+  }, [feedProjects, featuredProjects, feedFilter, newsEntries]);
+
+  const handleTabChange = useCallback((tab: string) => {
+    setView({ tab: tab as Tab });
+  }, []);
+
+  const handleProjectClick = useCallback(async (project: Project) => {
+    let profile = (project as Project & { profiles?: Profile }).profiles;
+    if (!profile) {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", project.user_id)
+        .single();
+      profile = data;
+    }
+    if (profile) {
+      setView((v) => ({ ...v, projectDetail: { project, profile: profile! } }));
+    }
+  }, []);
+
+  const handleUserClick = useCallback((username: string) => {
+    setView({ tab: "profile", viewUsername: username });
+  }, []);
+
+  const handleBackFromDetail = useCallback(() => {
+    setView((v) => ({ ...v, projectDetail: undefined }));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+        <p className="text-muted">Loading...</p>
+      </div>
+    );
+  }
+
+  const showingDetail = !!view.projectDetail;
+
+  return (
+    <div className="flex min-h-screen bg-background text-foreground">
+      <Sidebar
+        activeTab={view.tab}
+        onTabChange={handleTabChange}
+        profile={currentUser}
+        publishedCount={userPublishedCount}
+        totalDownloads={userTotalDownloads}
+        feedProjects={feedProjects}
+      />
+
+      <main
+        className="ml-[240px] flex-1 overflow-y-auto min-h-screen"
+        style={{ background: "radial-gradient(ellipse at top center, rgba(56,130,220,0.04) 0%, transparent 60%)" }}
+      >
+        <div className="mx-auto max-w-[860px] px-[52px] py-[44px]">
+          {showingDetail ? (
+            <ProjectDetail
+              project={view.projectDetail!.project}
+              profile={view.projectDetail!.profile}
+              isOwner={view.projectDetail!.project.user_id === currentUserId}
+              onBack={handleBackFromDetail}
+              onUserClick={handleUserClick}
+              currentUserId={currentUserId}
+              allDownloads={allDownloads}
+            />
+          ) : view.tab === "feed" ? (
+            <div>
+              <h1 className="font-serif italic text-foreground mb-3" style={{ fontSize: 42 }}>For You</h1>
+              <p className="mb-6" style={{ fontSize: 14, color: "#52525f" }}>What builders are shipping right now</p>
+
+              {/* Feed filter tabs */}
+              <div className="flex gap-1 mb-8 rounded-lg p-1" style={{ background: "var(--bg-card)", border: "1px solid var(--border-subtle)", width: "fit-content" }}>
+                <button
+                  onClick={() => setFeedFilter("all")}
+                  className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors duration-150 ${
+                    feedFilter === "all"
+                      ? "bg-white/10 text-foreground"
+                      : "text-muted hover:text-foreground/70"
+                  }`}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => setFeedFilter("following")}
+                  className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors duration-150 ${
+                    feedFilter === "following"
+                      ? "bg-white/10 text-foreground"
+                      : "text-muted hover:text-foreground/70"
+                  }`}
+                >
+                  Following
+                </button>
+              </div>
+
+              {/* Daily Briefing */}
+              {currentUser && !feedLoading && (
+                <DailyBriefing
+                  currentUser={currentUser}
+                  feedProjects={feedProjects}
+                  allUsers={allUsers}
+                  trendingNews={newsEntries[0]}
+                />
+              )}
+
+              <div className="h-6" />
+
+              {feedLoading ? (
+                <div className="text-muted py-16 text-center">Loading feed...</div>
+              ) : mergedFeed.length === 0 ? (
+                <EmptyState
+                  title="Your feed is empty"
+                  message="Follow some builders and watch this fill up with inspiration."
+                  actions={[
+                    { label: "Discover Builders", onClick: () => handleTabChange("search"), primary: true },
+                    { label: "Setup Agent", onClick: () => handleTabChange("setup") },
+                  ]}
+                />
+              ) : (
+                <div className="flex flex-col gap-4">
+                  {mergedFeed.map((item, idx) => {
+                    if (item.kind === "news") {
+                      return <NewsCard key={item.entry.id} entry={item.entry} />;
+                    }
+                    if (item.kind === "featured") {
+                      const profile = item.project.profiles;
+                      const displayName = profile.display_name || profile.username;
+                      return (
+                        <div key={`feat-${item.project.id}`}>
+                          <div className="mb-3 flex items-center gap-2.5">
+                            <Star size={14} className="text-accent" />
+                            <span className="text-xs font-semibold text-accent uppercase tracking-wider">Featured Builder</span>
+                            <span className="text-xs text-muted ml-1">·</span>
+                            <button
+                              onClick={() => handleUserClick(profile.username)}
+                              className="flex items-center gap-1.5"
+                            >
+                              <Avatar name={displayName} size={20} />
+                              <span className="text-sm font-medium text-foreground hover:underline">{displayName}</span>
+                            </button>
+                            <span className="ml-auto text-xs text-muted">{timeAgo(item.project.last_activity)}</span>
+                          </div>
+                          <ProjectCard
+                            project={item.project}
+                            onClick={() => handleProjectClick(item.project)}
+                          />
+                        </div>
+                      );
+                    }
+                    // Regular project
+                    return (
+                      <FeedItem
+                        key={item.project.id}
+                        project={item.project}
+                        profile={item.project.profiles}
+                        onProjectClick={handleProjectClick}
+                        onUserClick={handleUserClick}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          ) : view.tab === "search" ? (
+            <SearchView
+              onProjectClick={handleProjectClick}
+              onUserClick={handleUserClick}
+            />
+          ) : view.tab === "leaderboard" ? (
+            <LeaderboardView
+              currentUserId={currentUserId}
+              onUserClick={handleUserClick}
+              onTabChange={handleTabChange}
+            />
+          ) : view.tab === "profile" ? (
+            <ProfileView
+              username={view.viewUsername}
+              currentUserId={currentUserId}
+              onProjectClick={handleProjectClick}
+              onTabChange={handleTabChange}
+            />
+          ) : view.tab === "setup" ? (
+            <SetupView userId={currentUserId} />
+          ) : null}
+        </div>
+      </main>
+    </div>
+  );
+}
