@@ -22,8 +22,8 @@ export default function ProjectCard({ project, onClick, onContextMenu, isStealth
   if (project.downloads > 0) {
     statText = `${formatNumber(project.downloads)} downloads`;
     StatIcon = ArrowDown;
-  } else if (project.commit_count > 0) {
-    statText = `${formatNumber(project.commit_count)} commits`;
+  } else if (project.commits > 0) {
+    statText = `${formatNumber(project.commits)} commits`;
     StatIcon = GitCommit;
   } else if (project.tokens_used > 0) {
     statText = `${formatNumber(project.tokens_used)} tokens`;

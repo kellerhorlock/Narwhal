@@ -20,7 +20,7 @@ export interface Project {
   tech_stack: string[];
   status: "active" | "published" | "stealth";
   tokens_used: number;
-  commit_count: number;
+  commits: number;
   lines_changed: number;
   downloads: number;
   last_activity: string;

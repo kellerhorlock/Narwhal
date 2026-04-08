@@ -3,17 +3,14 @@ import { NextRequest } from "next/server";
 
 async function authenticateKey(request: NextRequest) {
   const apiKey = request.headers.get("x-narwhal-key");
-  console.log("[sync] Received key:", apiKey);
-  console.log("[sync] Service role key present:", !!process.env.SUPABASE_SERVICE_ROLE_KEY);
   if (!apiKey) return null;
 
-  const { data, error } = await supabaseAdmin
+  const { data } = await supabaseAdmin
     .from("profiles")
     .select("id")
     .eq("narwhal_api_key", apiKey)
     .single();
 
-  console.log("[sync] Lookup result:", data, "error:", error);
   return data?.id || null;
 }
 

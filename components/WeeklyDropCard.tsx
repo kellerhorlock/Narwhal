@@ -13,7 +13,7 @@ interface WeeklyDropCardProps {
 export default function WeeklyDropCard({ projects, followerDelta }: WeeklyDropCardProps) {
   const [copied, setCopied] = useState(false);
 
-  const totalCommits = projects.reduce((s, p) => s + (p.commit_count || 0), 0);
+  const totalCommits = projects.reduce((s, p) => s + (p.commits || 0), 0);
   const totalTokens = projects.reduce((s, p) => s + (p.tokens_used || 0), 0);
   const projectNames = projects.map((p) => p.name);
   const summary = generateWeeklySummary(projectNames, totalCommits, projects.length);

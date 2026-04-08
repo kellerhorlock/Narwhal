@@ -30,7 +30,7 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
   // Stats to show (filtered by hidden_stats)
   const allStats = [
     { key: "tokens", label: "Tokens Used", value: project.tokens_used, green: true },
-    { key: "commits", label: "Commits", value: project.commit_count },
+    { key: "commits", label: "Commits", value: project.commits },
     { key: "lines_changed", label: "Lines Changed", value: project.lines_changed },
     { key: "downloads", label: "Downloads", value: project.downloads },
   ];
@@ -38,11 +38,11 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
 
   // "How it was built" paragraph
   const techStr = (project.tech_stack || []).join(", ");
-  const tokensPerCommit = project.commit_count > 0 ? Math.round(project.tokens_used / project.commit_count) : 0;
+  const tokensPerCommit = project.commits > 0 ? Math.round(project.tokens_used / project.commits) : 0;
 
   let insightParts: string[] = [];
   if (techStr) insightParts.push(`Built with ${techStr}`);
-  if (project.commit_count > 0) insightParts.push(`over ${formatNumber(project.commit_count)} commits`);
+  if (project.commits > 0) insightParts.push(`over ${formatNumber(project.commits)} commits`);
   let insightText = insightParts.join(" ");
   if (insightText) insightText += ".";
   if (project.tokens_used > 0) {
@@ -54,7 +54,7 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
   let insightExtra = "";
   if (project.downloads > 100) {
     insightExtra = "One of the most downloaded projects on Narwhal.";
-  } else if (project.commit_count > 200) {
+  } else if (project.commits > 200) {
     insightExtra = "One of the most actively developed projects on the platform.";
   }
 
