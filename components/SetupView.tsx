@@ -65,7 +65,7 @@ export default function SetupView({ userId }: SetupViewProps) {
     fetchApiKey();
   }, []);
 
-  const syncUrl = `${typeof window !== "undefined" ? window.location.origin : "http://localhost:3000"}/api/sync`;
+  const syncUrl = "https://narwhal-five.vercel.app/api/sync";
 
   const prompt = `I need you to connect my coding projects to my Narwhal profile (narwhal.dev — a social platform for builders).
 
