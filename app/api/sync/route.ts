@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     tech_stack: tech_stack || [],
     status: status || "stealth",
     tokens_used: tokens_used || 0,
-    commit_count: commits || 0,
+    commits: commits || 0,
     lines_changed: lines_changed || 0,
     last_activity: new Date().toISOString(),
   });
@@ -85,15 +85,7 @@ export async function PATCH(request: NextRequest) {
     return Response.json({ error: "name is required to identify the project" }, { status: 400 });
   }
 
-  // Map "commits" to "commit_count" if provided
-  const dbUpdates: Record<string, unknown> = {};
-  for (const [key, value] of Object.entries(updates)) {
-    if (key === "commits") {
-      dbUpdates.commit_count = value;
-    } else {
-      dbUpdates[key] = value;
-    }
-  }
+  const dbUpdates: Record<string, unknown> = { ...updates };
 
   const { error } = await supabaseAdmin
     .from("projects")
