@@ -1,6 +1,6 @@
 "use client";
 
-import { formatNumber, estimateWorkTime } from "@/lib/helpers";
+import { formatNumber, deriveStats, formatTokens } from "@/lib/helpers";
 
 interface HumanMachineStatsProps {
   totalCommits: number;
@@ -9,10 +9,6 @@ interface HumanMachineStatsProps {
   followerCount: number;
   followingCount: number;
   createdAt: string;
-  totalTokens: number;
-  totalLinesChanged: number;
-  projectsWithAI: number;
-  streakDays: number;
 }
 
 function renderVal(v: number | string | null): string {
@@ -29,19 +25,13 @@ export default function HumanMachineStats({
   followerCount,
   followingCount,
   createdAt,
-  totalTokens,
-  totalLinesChanged,
-  projectsWithAI,
-  streakDays,
 }: HumanMachineStatsProps) {
-  const hoursBuilding = estimateWorkTime(totalCommits);
+  const stats = deriveStats(totalCommits);
+  const hoursDisplay = stats.hoursBuilding > 0 ? `~${stats.hoursBuilding}h` : null;
   const shipRate = projectCount > 0 && launchedCount > 0
     ? `${Math.round((launchedCount / projectCount) * 100)}%`
     : null;
   const daysOnPlatform = Math.max(1, Math.floor((Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60 * 24)));
-  const avgTokensPerCommit = totalCommits > 0 && totalTokens > 0
-    ? Math.round(totalTokens / totalCommits)
-    : 0;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -60,7 +50,7 @@ export default function HumanMachineStats({
           </span>
         </div>
         <div className="grid grid-cols-3 gap-x-4 gap-y-4">
-          <Stat label="Hours Building" value={hoursBuilding} />
+          <Stat label="Hours Building" value={hoursDisplay} />
           <Stat label="Projects" value={projectCount} />
           <Stat label="Launched" value={launchedCount} />
           <Stat label="Ship Rate" value={shipRate} />
@@ -85,12 +75,11 @@ export default function HumanMachineStats({
           </span>
         </div>
         <div className="grid grid-cols-3 gap-x-4 gap-y-4">
-          <Stat label="Tokens Consumed" value={totalTokens} green mono />
+          <Stat label="Tokens Consumed" value={totalCommits > 0 ? formatTokens(totalCommits) : null} green mono />
           <Stat label="Total Commits" value={totalCommits} mono />
-          <Stat label="Lines of Code" value={totalLinesChanged} mono />
-          <Stat label="Avg Tokens/Commit" value={avgTokensPerCommit} mono />
-          <Stat label="Projects with AI" value={projectsWithAI} mono />
-          <Stat label="Streak" value={streakDays > 0 ? `${streakDays}d` : null} mono />
+          <Stat label="Est. Lines of Code" value={stats.linesOfCode} mono />
+          <Stat label="Avg Tokens/Commit" value={totalCommits > 0 ? "25K" : null} mono />
+          <Stat label="Projects" value={projectCount} mono />
         </div>
       </div>
     </div>

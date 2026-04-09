@@ -28,16 +28,14 @@ export async function POST(request: NextRequest) {
   }
 
   const {
-    name, description, tech_stack, status, tokens_used, commits,
-    lines_changed, landing_url, download_url, thumbnail_url,
+    name, description, tech_stack, status, commits,
+    landing_url, download_url, thumbnail_url,
   } = body as {
     name?: string;
     description?: string;
     tech_stack?: string[];
     status?: string;
-    tokens_used?: number;
     commits?: number;
-    lines_changed?: number;
     landing_url?: string | null;
     download_url?: string | null;
     thumbnail_url?: string | null;
@@ -53,9 +51,7 @@ export async function POST(request: NextRequest) {
     description: description || null,
     tech_stack: tech_stack || [],
     status: status || "stealth",
-    tokens_used: tokens_used || 0,
     commits: commits || 0,
-    lines_changed: lines_changed || 0,
     landing_url: landing_url || null,
     download_url: download_url || null,
     thumbnail_url: thumbnail_url || null,
@@ -82,16 +78,19 @@ export async function PATCH(request: NextRequest) {
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { name, ...updates } = body as {
+  const { name, commits, last_activity } = body as {
     name?: string;
-    [key: string]: unknown;
+    commits?: number;
+    last_activity?: string;
   };
 
   if (!name) {
     return Response.json({ error: "name is required to identify the project" }, { status: 400 });
   }
 
-  const dbUpdates: Record<string, unknown> = { ...updates };
+  const dbUpdates: Record<string, unknown> = {};
+  if (commits !== undefined) dbUpdates.commits = commits;
+  if (last_activity) dbUpdates.last_activity = last_activity;
 
   const { error } = await supabaseAdmin
     .from("projects")

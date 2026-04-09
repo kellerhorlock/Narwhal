@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { formatNumber, getWeekLabel, generateWeeklySummary, estimateWorkTime, estimateTokens } from "@/lib/helpers";
+import { formatNumber, getWeekLabel, generateWeeklySummary, deriveStats, formatTokens } from "@/lib/helpers";
 import { Share2, Check } from "lucide-react";
 import type { Project } from "@/lib/types";
 
@@ -14,10 +14,10 @@ export default function WeeklyDropCard({ projects, followerDelta }: WeeklyDropCa
   const [copied, setCopied] = useState(false);
 
   const totalCommits = projects.reduce((s, p) => s + (p.commits || 0), 0);
-  const totalTokens = projects.reduce((s, p) => s + estimateTokens(p.commits || 0, p.lines_changed || 0, p.tokens_used), 0);
+  const stats = deriveStats(totalCommits);
   const projectNames = projects.map((p) => p.name);
   const summary = generateWeeklySummary(projectNames, totalCommits, projects.length);
-  const humanHours = estimateWorkTime(totalCommits);
+  const humanHours = stats.hoursBuilding > 0 ? `~${stats.hoursBuilding}h` : "Just started";
 
   async function handleShare() {
     await navigator.clipboard.writeText(window.location.href);
@@ -51,7 +51,7 @@ export default function WeeklyDropCard({ projects, followerDelta }: WeeklyDropCa
         <div className="flex items-center gap-2 text-xs">
           <span className="text-[10px]">🤖</span>
           <span className="text-foreground/70">
-            AI: <span className="font-mono font-semibold text-accent">{formatNumber(totalTokens)}</span> tokens · <span className="font-mono font-semibold text-foreground">{formatNumber(totalCommits)}</span> commits
+            AI: <span className="font-mono font-semibold text-accent">{totalCommits > 0 ? formatTokens(totalCommits) : "0"}</span> tokens · <span className="font-mono font-semibold text-foreground">{formatNumber(totalCommits)}</span> commits
           </span>
         </div>
       </div>

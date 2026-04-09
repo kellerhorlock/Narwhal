@@ -19,7 +19,7 @@ import type { Profile, Project } from "@/lib/types";
 import { Star } from "lucide-react";
 import Avatar from "@/components/Avatar";
 import ProjectCard from "@/components/ProjectCard";
-import { timeAgo, estimateTokens } from "@/lib/helpers";
+import { timeAgo } from "@/lib/helpers";
 
 type Tab = "feed" | "search" | "leaderboard" | "profile" | "setup";
 type FeedFilter = "all" | "following";
@@ -115,7 +115,7 @@ export default function FeedPage() {
           .order("last_activity", { ascending: false })
           .limit(50),
         supabase.from("profiles").select("*").order("tokens_today", { ascending: false }),
-        supabase.from("projects").select("status, downloads, user_id, commits, lines_changed, tokens_used"),
+        supabase.from("projects").select("status, downloads, user_id, commits"),
         // Featured projects: most downloads/commits for new user discovery
         supabase
           .from("projects")
@@ -132,7 +132,7 @@ export default function FeedPage() {
       const myProjects = (userProjects || []).filter((p) => p.user_id === currentUserId);
       setUserPublishedCount(myProjects.filter((p) => p.status === "published").length);
       setUserTotalDownloads(myProjects.reduce((s, p) => s + (p.downloads || 0), 0));
-      setUserEstimatedTokens(myProjects.reduce((s, p) => s + estimateTokens(p.commits || 0, p.lines_changed || 0, p.tokens_used), 0));
+      setUserEstimatedTokens(myProjects.reduce((s, p) => s + (p.commits || 0) * 25000, 0));
       setAllDownloads((userProjects || []).map((p) => p.downloads || 0));
 
       setFeedLoading(false);

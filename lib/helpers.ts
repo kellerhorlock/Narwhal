@@ -59,17 +59,20 @@ export function generateGradientSVG(name: string, width = 400, height = 240): st
   )}`;
 }
 
-export function estimateTokens(commits: number, linesChanged: number, storedTokens?: number): number {
-  if (storedTokens && storedTokens > 0) return storedTokens;
-  return (linesChanged * 80) + (commits * 25000);
+export function deriveStats(commits: number) {
+  return {
+    tokens: commits * 25000,
+    linesOfCode: commits * 65,
+    hoursBuilding: Math.round(commits * 0.65 * 10) / 10,
+    workDays: Math.round((commits * 0.65) / 8 * 10) / 10,
+  };
 }
 
-export function estimateWorkTime(commits: number): string {
-  if (commits === 0) return "Just started";
-  const hours = commits * 0.65;
-  if (hours < 100) return `~${Math.round(hours)}h`;
-  const days = Math.round(hours / 8);
-  return `~${days}d`;
+export function formatTokens(commits: number): string {
+  const tokens = commits * 25000;
+  if (tokens >= 1_000_000) return (tokens / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+  if (tokens >= 1_000) return (tokens / 1_000).toFixed(0) + 'K';
+  return tokens.toString();
 }
 
 export function formatNumber(n: number | null | undefined): string {
@@ -184,20 +187,17 @@ export function generateWeeklySummary(
 export function generateProjectInsights(
   name: string,
   techStack: string[],
-  tokens: number,
   commits: number,
   downloads: number,
-  linesChanged: number,
   allDownloads: number[]
 ): string[] {
   const lines: string[] = [];
+  const stats = deriveStats(commits);
 
   const techStr = techStack.length > 0 ? ` with ${techStack.join(", ")}` : "";
-  const tokensPerCommit = commits > 0 ? Math.round(tokens / commits) : 0;
   let main = `Built over ${formatNumber(commits)} commits${techStr}.`;
-  if (tokens > 0) main += ` ${formatNumber(tokens)} tokens consumed`;
-  if (tokensPerCommit > 0) main += `, averaging ${formatNumber(tokensPerCommit)} per commit`;
-  main += ".";
+  if (stats.tokens > 0) main += ` ~${formatTokens(commits)} tokens consumed, averaging ~25K per commit.`;
+  if (stats.hoursBuilding > 0) main += ` ~${stats.hoursBuilding}h of estimated development time.`;
   if (downloads > 0) main += ` ${formatNumber(downloads)} developers have downloaded this project.`;
   lines.push(main);
 

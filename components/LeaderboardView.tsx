@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { createClient } from "@/lib/supabase";
-import { formatNumber, calculateBuilderScore, estimateTokens } from "@/lib/helpers";
+import { formatNumber, calculateBuilderScore } from "@/lib/helpers";
 import Avatar from "./Avatar";
 import EmptyState from "./EmptyState";
 import type { Profile } from "@/lib/types";
@@ -32,7 +32,7 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
       const [{ data: users }, { data: follows }, { data: projects }] = await Promise.all([
         supabase.from("profiles").select("*").order("total_tokens_used", { ascending: false }),
         supabase.from("follows").select("following_id").eq("follower_id", currentUserId),
-        supabase.from("projects").select("user_id, status, downloads, tokens_used, commits, lines_changed"),
+        supabase.from("projects").select("user_id, status, downloads, commits"),
       ]);
 
       setAllUsers(users || []);
@@ -45,7 +45,7 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
       for (const p of projects || []) {
         if (p.status === "published") pub[p.user_id] = (pub[p.user_id] || 0) + 1;
         dl[p.user_id] = (dl[p.user_id] || 0) + (p.downloads || 0);
-        userTokensFromProjects[p.user_id] = (userTokensFromProjects[p.user_id] || 0) + estimateTokens(p.commits || 0, p.lines_changed || 0, p.tokens_used);
+        userTokensFromProjects[p.user_id] = (userTokensFromProjects[p.user_id] || 0) + (p.commits || 0) * 25000;
       }
       setUserPublished(pub);
       setUserDownloads(dl);

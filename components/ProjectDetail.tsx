@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase";
-import { generateGradientSVG, formatNumber, timeAgo, estimateWorkTime, estimateTokens } from "@/lib/helpers";
+import { generateGradientSVG, formatNumber, timeAgo, deriveStats, formatTokens } from "@/lib/helpers";
 import Avatar from "./Avatar";
 import EditProjectModal from "./EditProjectModal";
 import type { Project, Profile } from "@/lib/types";
@@ -25,9 +25,7 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
   const displayName = profile.display_name || profile.username;
   const hiddenStats = project.hidden_stats || [];
 
-  const estHours = Math.round(project.commits * 0.65);
-  const workTimeDisplay = estimateWorkTime(project.commits);
-  const estimatedTokens = estimateTokens(project.commits, project.lines_changed, project.tokens_used);
+  const stats = deriveStats(project.commits);
 
   async function toggleVisibility() {
     setToggling(true);
@@ -38,12 +36,12 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
     setToggling(false);
   }
 
-  // Stats to show (filtered by hidden_stats), with est work time added
+  // Stats to show (filtered by hidden_stats)
   const allStats = [
-    { key: "tokens", label: "Tokens Used", value: estimatedTokens, green: true },
+    { key: "tokens", label: "Tokens", value: stats.tokens, display: formatTokens(project.commits), green: true },
     { key: "commits", label: "Commits", value: project.commits },
-    { key: "lines_changed", label: "Lines Changed", value: project.lines_changed },
-    { key: "est_work_time", label: "Est. Work Time", value: estHours, display: workTimeDisplay },
+    { key: "lines_changed", label: "Est. Lines", value: stats.linesOfCode },
+    { key: "est_work_time", label: "Est. Hours", value: stats.hoursBuilding, display: `${stats.hoursBuilding}h` },
   ];
   const visibleStats = allStats.filter((s) => !hiddenStats.includes(s.key));
 
@@ -54,9 +52,9 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
   if (techStr) insightParts.push(`Built with ${techStr} over ${formatNumber(project.commits)} commits.`);
   else if (project.commits > 0) insightParts.push(`Built over ${formatNumber(project.commits)} commits.`);
 
-  if (estHours > 0) insightParts.push(`${estHours} hours of estimated development time.`);
+  if (stats.hoursBuilding > 0) insightParts.push(`~${stats.hoursBuilding} hours of estimated development time.`);
 
-  if (estimatedTokens > 0) insightParts.push(`${formatNumber(estimatedTokens)} AI tokens consumed during development.`);
+  if (stats.tokens > 0) insightParts.push(`~${formatTokens(project.commits)} AI tokens consumed, averaging ~25K per commit.`);
 
   if (project.commits > 100) insightParts.push("One of the most actively developed projects on Narwhal.");
 

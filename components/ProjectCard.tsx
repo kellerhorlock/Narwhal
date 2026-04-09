@@ -1,6 +1,6 @@
 "use client";
 
-import { generateGradientSVG, formatNumber, estimateWorkTime } from "@/lib/helpers";
+import { generateGradientSVG, formatTokens, deriveStats } from "@/lib/helpers";
 import type { Project } from "@/lib/types";
 import { Eye, EyeOff, Hammer } from "lucide-react";
 
@@ -20,8 +20,8 @@ export default function ProjectCard({ project, onClick, onContextMenu, isStealth
 
   const description = project.description || "No description yet";
   const commitCount = project.commits || 0;
-  const workTime = estimateWorkTime(commitCount);
-  const statLine = commitCount > 0 ? `${formatNumber(commitCount)} commits · ${workTime} of work` : workTime;
+  const stats = deriveStats(commitCount);
+  const statLine = commitCount > 0 ? `${formatTokens(commitCount)} tokens · ~${stats.hoursBuilding}h` : "Just started";
 
   return (
     <div
