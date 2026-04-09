@@ -59,6 +59,11 @@ export function generateGradientSVG(name: string, width = 400, height = 240): st
   )}`;
 }
 
+export function estimateTokens(commits: number, linesChanged: number, storedTokens?: number): number {
+  if (storedTokens && storedTokens > 0) return storedTokens;
+  return (linesChanged * 80) + (commits * 25000);
+}
+
 export function estimateWorkTime(commits: number): string {
   if (commits === 0) return "Just started";
   const hours = commits * 0.65;

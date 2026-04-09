@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { formatNumber, getWeekLabel, generateWeeklySummary, estimateWorkTime } from "@/lib/helpers";
+import { formatNumber, getWeekLabel, generateWeeklySummary, estimateWorkTime, estimateTokens } from "@/lib/helpers";
 import { Share2, Check } from "lucide-react";
 import type { Project } from "@/lib/types";
 
@@ -14,7 +14,7 @@ export default function WeeklyDropCard({ projects, followerDelta }: WeeklyDropCa
   const [copied, setCopied] = useState(false);
 
   const totalCommits = projects.reduce((s, p) => s + (p.commits || 0), 0);
-  const totalTokens = projects.reduce((s, p) => s + (p.tokens_used || 0), 0);
+  const totalTokens = projects.reduce((s, p) => s + estimateTokens(p.commits || 0, p.lines_changed || 0, p.tokens_used), 0);
   const projectNames = projects.map((p) => p.name);
   const summary = generateWeeklySummary(projectNames, totalCommits, projects.length);
   const humanHours = estimateWorkTime(totalCommits);

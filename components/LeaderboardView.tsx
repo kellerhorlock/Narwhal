@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { createClient } from "@/lib/supabase";
-import { formatNumber, calculateBuilderScore } from "@/lib/helpers";
+import { formatNumber, calculateBuilderScore, estimateTokens } from "@/lib/helpers";
 import Avatar from "./Avatar";
 import EmptyState from "./EmptyState";
 import type { Profile } from "@/lib/types";
@@ -21,6 +21,7 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
   const [followingIds, setFollowingIds] = useState<Set<string>>(new Set());
   const [userPublished, setUserPublished] = useState<Record<string, number>>({});
   const [userDownloads, setUserDownloads] = useState<Record<string, number>>({});
+  const [userTokens, setUserTokens] = useState<Record<string, number>>({});
   const [communityStats, setCommunityStats] = useState({ tokens: 0, builders: 0, shipped: 0, downloads: 0 });
   const [loading, setLoading] = useState(true);
 
@@ -31,7 +32,7 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
       const [{ data: users }, { data: follows }, { data: projects }] = await Promise.all([
         supabase.from("profiles").select("*").order("total_tokens_used", { ascending: false }),
         supabase.from("follows").select("following_id").eq("follower_id", currentUserId),
-        supabase.from("projects").select("user_id, status, downloads, tokens_used, commits"),
+        supabase.from("projects").select("user_id, status, downloads, tokens_used, commits, lines_changed"),
       ]);
 
       setAllUsers(users || []);
@@ -41,17 +42,16 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
       const pub: Record<string, number> = {};
       const dl: Record<string, number> = {};
       const userTokensFromProjects: Record<string, number> = {};
-      const userCommitsFromProjects: Record<string, number> = {};
       for (const p of projects || []) {
         if (p.status === "published") pub[p.user_id] = (pub[p.user_id] || 0) + 1;
         dl[p.user_id] = (dl[p.user_id] || 0) + (p.downloads || 0);
-        userTokensFromProjects[p.user_id] = (userTokensFromProjects[p.user_id] || 0) + (p.tokens_used || 0);
-        userCommitsFromProjects[p.user_id] = (userCommitsFromProjects[p.user_id] || 0) + (p.commits || 0);
+        userTokensFromProjects[p.user_id] = (userTokensFromProjects[p.user_id] || 0) + estimateTokens(p.commits || 0, p.lines_changed || 0, p.tokens_used);
       }
       setUserPublished(pub);
       setUserDownloads(dl);
+      setUserTokens(userTokensFromProjects);
 
-      const totalTokens = (projects || []).reduce((s, p) => s + (p.tokens_used || 0), 0);
+      const totalTokens = Object.values(userTokensFromProjects).reduce((s, t) => s + t, 0);
       const shipped = (projects || []).filter((p) => p.status === "published").length;
       const totalDownloads = (projects || []).reduce((s, p) => s + (p.downloads || 0), 0);
       setCommunityStats({
@@ -72,22 +72,24 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
     }
     if (mode === "score") {
       list = [...list].sort((a, b) => {
-        const sa = calculateBuilderScore(a.total_tokens_used, userPublished[a.id] || 0, userDownloads[a.id] || 0, a.streak_days, a.hours_this_month).total;
-        const sb = calculateBuilderScore(b.total_tokens_used, userPublished[b.id] || 0, userDownloads[b.id] || 0, b.streak_days, b.hours_this_month).total;
+        const sa = calculateBuilderScore(userTokens[a.id] || 0, userPublished[a.id] || 0, userDownloads[a.id] || 0, a.streak_days, a.hours_this_month).total;
+        const sb = calculateBuilderScore(userTokens[b.id] || 0, userPublished[b.id] || 0, userDownloads[b.id] || 0, b.streak_days, b.hours_this_month).total;
         return sb - sa;
       });
+    } else {
+      list = [...list].sort((a, b) => (userTokens[b.id] || 0) - (userTokens[a.id] || 0));
     }
     return list;
-  }, [allUsers, mode, followingIds, currentUserId, userPublished, userDownloads]);
+  }, [allUsers, mode, followingIds, currentUserId, userPublished, userDownloads, userTokens]);
 
   const getDisplayValue = (user: Profile) => {
     if (mode === "score") {
-      return calculateBuilderScore(user.total_tokens_used, userPublished[user.id] || 0, userDownloads[user.id] || 0, user.streak_days, user.hours_this_month).total;
+      return calculateBuilderScore(userTokens[user.id] || 0, userPublished[user.id] || 0, userDownloads[user.id] || 0, user.streak_days, user.hours_this_month).total;
     }
-    return user.tokens_today;
+    return userTokens[user.id] || 0;
   };
 
-  const valueLabel = mode === "score" ? "score" : "tokens today";
+  const valueLabel = mode === "score" ? "score" : "tokens";
 
   const top3 = ranked.slice(0, 3);
   const rest = ranked.slice(3);
@@ -208,7 +210,7 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
                       {formatNumber(getDisplayValue(user))}
                     </span>
                     <span className="text-right text-sm font-mono text-foreground/60">
-                      {formatNumber(user.total_tokens_used)}
+                      {formatNumber(userTokens[user.id] || 0)}
                     </span>
                     <span className="text-right text-sm font-mono text-foreground/60">
                       {user.streak_days}d {user.streak_days >= 14 ? "🔥" : ""}

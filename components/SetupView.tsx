@@ -75,20 +75,13 @@ STEP 0 — WARM UP:
 curl -s ${syncUrl} > /dev/null 2>&1
 Wait 2 seconds.
 
-STEP 1 — FIND MY CLAUDE TOKEN USAGE:
-Check if ~/.claude/usage.json or ~/.claude/stats.json or ~/.claude/projects/ exists.
-If so, read the total token usage across all sessions. Store this number as MY_TOTAL_TOKENS.
-Also check ~/.config/claude/ and ~/.local/share/claude/ as alternative locations.
-If you find per-project token data, map it to project directories.
-If no Claude usage data is found, set MY_TOTAL_TOKENS to 0.
-
-STEP 2 — SCAN FOR PROJECTS:
+STEP 1 — SCAN FOR PROJECTS:
 Search these directories: ~/Desktop, ~/Documents, ~/Projects, ~/repos, ~/code, ~/dev
 A project is any directory containing: package.json, Cargo.toml, pyproject.toml, go.mod, Gemfile, requirements.txt, pubspec.yaml, composer.json, or a .git directory.
 Skip: node_modules, .next, __pycache__, venv, dist, build, hidden directories, and any project named 'vibefeed' or 'narwhal'.
 Do NOT recurse deeper than 3 levels.
 
-STEP 3 — FOR EACH PROJECT, GATHER RICH DATA:
+STEP 2 — FOR EACH PROJECT, GATHER RICH DATA:
 
 A) BASIC INFO:
    - name: From package.json name field, or directory name
@@ -108,8 +101,7 @@ C) FIND A THUMBNAIL IMAGE:
    1. Look for screenshots in README.md — any markdown image links like ![](screenshot.png) or ![](docs/preview.png)
    2. Check for /public/og-image.png, /public/og.png, /public/screenshot.png, /public/preview.png
    3. Check for any .png or .jpg in /public/, /assets/, /docs/, /screenshots/ (pick the first one)
-   4. If the project has a live URL (see below), note it for thumbnail generation
-   5. If nothing found, leave thumbnail_url as null (the app generates a gradient fallback)
+   4. If nothing found, leave thumbnail_url as null (the app generates a gradient fallback)
    For any local image found, read it and convert to a base64 data URL: data:image/png;base64,[BASE64_DATA]
 
 D) FIND LIVE URLs:
@@ -121,24 +113,19 @@ D) FIND LIVE URLs:
    5. \`git remote -v\` and check if it's on GitHub — construct https://github.com/[user]/[repo]
    Store the live site URL as landing_url and the repo URL as download_url.
 
-E) ESTIMATE TOKENS:
-   If per-project Claude token data was found in Step 1, use that.
-   Otherwise estimate: (lines_of_code * 3) + (commits * 500)
-   This approximates AI-assisted development effort.
-
-STEP 4 — PRESENT EACH PROJECT FOR APPROVAL:
+STEP 3 — PRESENT EACH PROJECT FOR APPROVAL:
 Show each project like this:
 
 📦 [name]
    [description]
    Stack: [tech_stack]
-   [commits] commits · [lines] lines · ~[tokens] tokens
+   [commits] commits · [lines] lines
    🌐 Landing: [landing_url or "none found"]
    📂 Repo: [download_url or "none found"]
    🖼️ Image: [found/not found]
    Upload? (y/n)
 
-STEP 5 — UPLOAD APPROVED PROJECTS:
+STEP 4 — UPLOAD APPROVED PROJECTS:
 For each approved project, run:
 
 curl -s --max-time 30 -X POST '${syncUrl}' \\
@@ -149,20 +136,18 @@ curl -s --max-time 30 -X POST '${syncUrl}' \\
     "description": "[DESCRIPTION]",
     "tech_stack": [TECH_ARRAY_AS_JSON],
     "status": "stealth",
-    "tokens_used": [TOKENS],
     "commits": [COMMITS],
     "lines_changed": [LINES],
     "landing_url": "[LANDING_URL_OR_NULL]",
     "download_url": "[DOWNLOAD_URL_OR_NULL]",
-    "thumbnail_url": "[THUMBNAIL_URL_OR_NULL]",
-    "last_activity": "now()"
+    "thumbnail_url": "[THUMBNAIL_URL_OR_NULL]"
   }'
 
 Important: make sure ALL string values in the JSON are properly escaped. Description must not contain unescaped quotes.
 If a URL field is not found, use null (not the string "null").
 If curl fails, wait 5 seconds and retry once.
 
-STEP 6 — INSTALL AUTO-SYNC HOOKS:
+STEP 5 — INSTALL AUTO-SYNC HOOKS:
 For each uploaded project with a .git directory, create TWO hooks:
 
 File: .git/hooks/post-commit
@@ -170,14 +155,10 @@ Content:
 #!/bin/sh
 COMMITS=$(git log --oneline | wc -l | tr -d ' ')
 LINES=$(find . -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.jsx' -o -name '*.py' -o -name '*.rs' -o -name '*.go' -o -name '*.swift' | grep -v node_modules | grep -v .next | xargs wc -l 2>/dev/null | tail -1 | awk '{print $1}')
-TOKENS=0
-if [ -f ~/.claude/usage.json ]; then
-  TOKENS=$(cat ~/.claude/usage.json | grep -o '"total_tokens":[0-9]*' | head -1 | cut -d: -f2)
-fi
 curl -s --max-time 10 -X PATCH '${syncUrl}' \\
   -H 'x-narwhal-key: ${apiKey}' \\
   -H 'Content-Type: application/json' \\
-  -d "{\\"name\\": \\"[PROJECT_NAME]\\", \\"commits\\": $COMMITS, \\"lines_changed\\": \${LINES:-0}, \\"tokens_used\\": \${TOKENS:-0}, \\"last_activity\\": \\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\\"}" 2>/dev/null &
+  -d "{\\"name\\": \\"[PROJECT_NAME]\\", \\"commits\\": $COMMITS, \\"lines_changed\\": \${LINES:-0}, \\"last_activity\\": \\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\\"}" 2>/dev/null &
 
 Run: chmod +x .git/hooks/post-commit
 
@@ -185,21 +166,13 @@ File: .git/hooks/post-checkout
 Same content as post-commit.
 Run: chmod +x .git/hooks/post-checkout
 
-STEP 7 — UPDATE MY PROFILE TOKEN COUNT:
-If MY_TOTAL_TOKENS from Step 1 is > 0, update my profile:
-curl -s --max-time 10 -X PATCH '${syncUrl}' \\
-  -H 'x-narwhal-key: ${apiKey}' \\
-  -H 'Content-Type: application/json' \\
-  -d '{"update_profile_tokens": true, "total_tokens": [MY_TOTAL_TOKENS]}'
-
-STEP 8 — SUMMARY:
+STEP 6 — SUMMARY:
 ✅ Done! [X] projects uploaded to Narwhal.
 🔄 Auto-sync hooks installed on [Y] projects.
-🔑 Your token usage has been synced.
 📸 [Z] project thumbnails captured.
 
 Your profile is live at narwhal.codes
-Every future commit will automatically update your Narwhal profile. No action needed.`;
+Every future commit will automatically update your Narwhal profile. Token usage is calculated automatically from your commits and lines of code — no extra setup needed.`;
 
   async function handleCopy() {
     await navigator.clipboard.writeText(prompt);
@@ -297,13 +270,11 @@ Every future commit will automatically update your Narwhal profile. No action ne
               <div className="mt-3 rounded-xl border border-border bg-card p-4 text-sm text-foreground/60 leading-relaxed max-w-xl">
                 <p className="mb-2">When you paste this prompt into your AI coding agent, it will:</p>
                 <ol className="list-decimal list-inside space-y-1.5 text-foreground/50">
-                  <li>Find your Claude token usage data (if available)</li>
                   <li>Scan your machine for all coding project directories</li>
-                  <li>Gather rich data: description, tech stack, thumbnails, URLs, token estimates</li>
+                  <li>Gather rich data: description, tech stack, thumbnails, URLs, commits, lines of code</li>
                   <li>Show you each project and ask for your approval before uploading</li>
                   <li>Upload approved projects with full metadata to your Narwhal profile</li>
                   <li>Install git hooks so future commits auto-sync stats</li>
-                  <li>Sync your total token usage to your profile</li>
                 </ol>
               </div>
             )}
@@ -342,13 +313,11 @@ Every future commit will automatically update your Narwhal profile. No action ne
               <div className="mt-3 rounded-xl border border-border bg-card p-4 text-sm text-foreground/60 leading-relaxed max-w-xl">
                 <p className="mb-2">When you paste this prompt into your AI coding agent, it will:</p>
                 <ol className="list-decimal list-inside space-y-1.5 text-foreground/50">
-                  <li>Find your Claude token usage data (if available)</li>
                   <li>Scan your machine for all coding project directories</li>
-                  <li>Gather rich data: description, tech stack, thumbnails, URLs, token estimates</li>
+                  <li>Gather rich data: description, tech stack, thumbnails, URLs, commits, lines of code</li>
                   <li>Show you each project and ask for your approval before uploading</li>
                   <li>Upload approved projects with full metadata to your Narwhal profile</li>
                   <li>Install git hooks so future commits auto-sync stats</li>
-                  <li>Sync your total token usage to your profile</li>
                 </ol>
               </div>
             )}

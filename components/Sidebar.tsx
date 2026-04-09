@@ -13,6 +13,7 @@ interface SidebarProps {
   profile: Profile | null;
   publishedCount?: number;
   totalDownloads?: number;
+  estimatedTokens?: number;
   feedProjects?: (Project & { profiles: Profile })[];
 }
 
@@ -35,10 +36,10 @@ function statDisplay(value: unknown, suffix = ""): string {
   return formatNumber(n) + suffix;
 }
 
-export default function Sidebar({ activeTab, onTabChange, profile, publishedCount = 0, totalDownloads = 0, feedProjects = [] }: SidebarProps) {
+export default function Sidebar({ activeTab, onTabChange, profile, publishedCount = 0, totalDownloads = 0, estimatedTokens = 0, feedProjects = [] }: SidebarProps) {
   const score = profile
     ? calculateBuilderScore(
-        safeNum(profile.total_tokens_used),
+        estimatedTokens,
         publishedCount,
         totalDownloads,
         safeNum(profile.streak_days),
@@ -145,7 +146,7 @@ export default function Sidebar({ activeTab, onTabChange, profile, publishedCoun
           <div className="grid grid-cols-3 gap-2 text-center mt-2">
             <div>
               <div className="text-[14px] font-bold font-mono text-accent">
-                {statDisplay(profile.total_tokens_used)}
+                {statDisplay(estimatedTokens)}
               </div>
               <div className="text-[9px] text-muted uppercase">3mo</div>
             </div>

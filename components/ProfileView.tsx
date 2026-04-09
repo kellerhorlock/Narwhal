@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase";
-import { timeAgo, calculateBuilderScore, getPercentile, formatNumber, estimateWorkTime } from "@/lib/helpers";
+import { timeAgo, calculateBuilderScore, getPercentile, formatNumber, estimateWorkTime, estimateTokens } from "@/lib/helpers";
 import Avatar from "./Avatar";
 import BuilderScoreBadge from "./BuilderScoreBadge";
 import HumanMachineStats from "./HumanMachineStats";
@@ -70,14 +70,16 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
       const { data: projectData } = await projectQuery;
       setProjects(projectData || []);
 
-      const { data: allUsers } = await supabase.from("profiles").select("id, total_tokens_used, streak_days, hours_this_month");
-      const { data: allProjects } = await supabase.from("projects").select("user_id, status, downloads");
+      const { data: allUsers } = await supabase.from("profiles").select("id, streak_days, hours_this_month");
+      const { data: allProjects } = await supabase.from("projects").select("user_id, status, downloads, commits, lines_changed, tokens_used");
 
       if (allUsers && allProjects) {
         const scores = allUsers.map((u) => {
-          const pub = allProjects.filter((p) => p.user_id === u.id && p.status === "published").length;
-          const dl = allProjects.filter((p) => p.user_id === u.id).reduce((s, p) => s + safeNum(p.downloads), 0);
-          return calculateBuilderScore(safeNum(u.total_tokens_used), pub, dl, safeNum(u.streak_days), safeNum(u.hours_this_month)).total;
+          const userProjs = allProjects.filter((p) => p.user_id === u.id);
+          const pub = userProjs.filter((p) => p.status === "published").length;
+          const dl = userProjs.reduce((s, p) => s + safeNum(p.downloads), 0);
+          const tokens = userProjs.reduce((s, p) => s + estimateTokens(safeNum(p.commits), safeNum(p.lines_changed), safeNum(p.tokens_used)), 0);
+          return calculateBuilderScore(tokens, pub, dl, safeNum(u.streak_days), safeNum(u.hours_this_month)).total;
         });
         setAllScores(scores);
       }
@@ -175,7 +177,7 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
   const totalDownloads = projects.reduce((sum, p) => sum + safeNum(p.downloads), 0);
 
   // Compute real stats from project data
-  const totalTokens = projects.reduce((sum, p) => sum + safeNum(p.tokens_used), 0);
+  const totalTokens = projects.reduce((sum, p) => sum + estimateTokens(safeNum(p.commits), safeNum(p.lines_changed), safeNum(p.tokens_used)), 0);
   const totalCommits = projects.reduce((sum, p) => sum + safeNum(p.commits), 0);
 
   // Hours/mo: total commits * 0.65 / months since joined (min 1)
@@ -185,7 +187,7 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
   // Weekly drop data: projects active in last 7 days
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
   const recentProjects = projects.filter((p) => p.last_activity && p.last_activity >= sevenDaysAgo);
-  const weeklyTokens = recentProjects.reduce((s, p) => s + safeNum(p.tokens_used), 0);
+  const weeklyTokens = recentProjects.reduce((s, p) => s + estimateTokens(safeNum(p.commits), safeNum(p.lines_changed), safeNum(p.tokens_used)), 0);
   const weeklyCommits = recentProjects.reduce((s, p) => s + safeNum(p.commits), 0);
 
   const score = calculateBuilderScore(totalTokens, launchedCount, totalDownloads, streakDays, hoursPerMonth);
@@ -248,7 +250,7 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
         createdAt={profile.created_at}
         totalTokens={totalTokens}
         totalLinesChanged={projects.reduce((sum, p) => sum + safeNum(p.lines_changed), 0)}
-        projectsWithAI={projects.filter((p) => safeNum(p.tokens_used) > 0).length}
+        projectsWithAI={projects.filter((p) => estimateTokens(safeNum(p.commits), safeNum(p.lines_changed), safeNum(p.tokens_used)) > 0).length}
         streakDays={streakDays}
       />
 

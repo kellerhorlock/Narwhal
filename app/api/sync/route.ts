@@ -14,18 +14,6 @@ async function authenticateKey(request: NextRequest) {
   return data?.id || null;
 }
 
-async function syncProfileTokens(userId: string) {
-  const { data: projects } = await supabaseAdmin
-    .from("projects")
-    .select("tokens_used")
-    .eq("user_id", userId);
-  const totalTokens = projects?.reduce((sum, p) => sum + (p.tokens_used || 0), 0) || 0;
-  await supabaseAdmin
-    .from("profiles")
-    .update({ total_tokens_used: totalTokens })
-    .eq("id", userId);
-}
-
 export async function POST(request: NextRequest) {
   const userId = await authenticateKey(request);
   if (!userId) {
@@ -78,9 +66,6 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: error.message }, { status: 500 });
   }
 
-  // Keep profile token total in sync
-  await syncProfileTokens(userId);
-
   return Response.json({ ok: true }, { status: 201 });
 }
 
@@ -95,16 +80,6 @@ export async function PATCH(request: NextRequest) {
     body = await request.json();
   } catch {
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
-  }
-
-  // Handle profile-level token update
-  if (body.update_profile_tokens) {
-    const totalTokens = typeof body.total_tokens === "number" ? body.total_tokens : 0;
-    await supabaseAdmin
-      .from("profiles")
-      .update({ total_tokens_used: totalTokens })
-      .eq("id", userId);
-    return Response.json({ ok: true }, { status: 200 });
   }
 
   const { name, ...updates } = body as {
@@ -127,9 +102,6 @@ export async function PATCH(request: NextRequest) {
   if (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
-
-  // Keep profile token total in sync after project update
-  await syncProfileTokens(userId);
 
   return Response.json({ ok: true }, { status: 200 });
 }

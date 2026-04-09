@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase";
-import { generateGradientSVG, formatNumber, timeAgo, estimateWorkTime } from "@/lib/helpers";
+import { generateGradientSVG, formatNumber, timeAgo, estimateWorkTime, estimateTokens } from "@/lib/helpers";
 import Avatar from "./Avatar";
 import EditProjectModal from "./EditProjectModal";
 import type { Project, Profile } from "@/lib/types";
@@ -27,6 +27,7 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
 
   const estHours = Math.round(project.commits * 0.65);
   const workTimeDisplay = estimateWorkTime(project.commits);
+  const estimatedTokens = estimateTokens(project.commits, project.lines_changed, project.tokens_used);
 
   async function toggleVisibility() {
     setToggling(true);
@@ -39,7 +40,7 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
 
   // Stats to show (filtered by hidden_stats), with est work time added
   const allStats = [
-    { key: "tokens", label: "Tokens Used", value: project.tokens_used, green: true },
+    { key: "tokens", label: "Tokens Used", value: estimatedTokens, green: true },
     { key: "commits", label: "Commits", value: project.commits },
     { key: "lines_changed", label: "Lines Changed", value: project.lines_changed },
     { key: "est_work_time", label: "Est. Work Time", value: estHours, display: workTimeDisplay },
@@ -55,7 +56,7 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
 
   if (estHours > 0) insightParts.push(`${estHours} hours of estimated development time.`);
 
-  if (project.tokens_used > 0) insightParts.push(`${formatNumber(project.tokens_used)} AI tokens consumed during development.`);
+  if (estimatedTokens > 0) insightParts.push(`${formatNumber(estimatedTokens)} AI tokens consumed during development.`);
 
   if (project.commits > 100) insightParts.push("One of the most actively developed projects on Narwhal.");
 
