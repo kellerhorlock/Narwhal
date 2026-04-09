@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase";
-import { timeAgo, calculateBuilderScore, getPercentile, formatNumber } from "@/lib/helpers";
+import { timeAgo, calculateBuilderScore, getPercentile, formatNumber, estimateWorkTime } from "@/lib/helpers";
 import Avatar from "./Avatar";
 import BuilderScoreBadge from "./BuilderScoreBadge";
-import StatsBar from "./StatsBar";
+import HumanMachineStats from "./HumanMachineStats";
 import WeeklyDropCard from "./WeeklyDropCard";
 import ProjectCard from "./ProjectCard";
 import ContextMenu from "./ContextMenu";
@@ -238,18 +238,18 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
         </div>
       </div>
 
-      {/* Stats bar */}
-      <StatsBar
-        stats={[
-          { label: "Projects", value: projects.length },
-          { label: "Followers", value: followerCount },
-          { label: "Following", value: followingCount },
-          { label: "Launched", value: launchedCount },
-          { label: "3mo Tokens", value: totalTokens > 0 ? totalTokens : null, green: true, mono: true },
-          { label: "Hours/mo", value: hoursPerMonth > 0 ? hoursPerMonth : null, mono: true },
-          { label: "Streak", value: streakDays > 0 ? `${streakDays}d` : null, mono: true },
-          { label: "Downloads", value: totalDownloads > 0 ? totalDownloads : null, mono: true },
-        ]}
+      {/* Human vs Machine stats */}
+      <HumanMachineStats
+        totalCommits={totalCommits}
+        projectCount={projects.length}
+        launchedCount={launchedCount}
+        followerCount={followerCount}
+        followingCount={followingCount}
+        createdAt={profile.created_at}
+        totalTokens={totalTokens}
+        totalLinesChanged={projects.reduce((sum, p) => sum + safeNum(p.lines_changed), 0)}
+        projectsWithAI={projects.filter((p) => safeNum(p.tokens_used) > 0).length}
+        streakDays={streakDays}
       />
 
       {/* Weekly drop card */}
