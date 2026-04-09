@@ -221,20 +221,23 @@ export default function FeedPage() {
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
-      <Sidebar
-        activeTab={view.tab}
-        onTabChange={handleTabChange}
-        profile={currentUser}
-        publishedCount={userPublishedCount}
-        totalDownloads={userTotalDownloads}
-        feedProjects={feedProjects}
-      />
+      {/* Desktop sidebar - hidden on mobile */}
+      <div className="hidden md:block">
+        <Sidebar
+          activeTab={view.tab}
+          onTabChange={handleTabChange}
+          profile={currentUser}
+          publishedCount={userPublishedCount}
+          totalDownloads={userTotalDownloads}
+          feedProjects={feedProjects}
+        />
+      </div>
 
       <main
-        className="ml-[240px] flex-1 overflow-y-auto min-h-screen"
+        className="md:ml-[240px] flex-1 overflow-y-auto min-h-screen pb-20 md:pb-0"
         style={{ background: "radial-gradient(ellipse at top center, rgba(56,130,220,0.04) 0%, transparent 60%)" }}
       >
-        <div className="mx-auto max-w-[860px] px-[52px] py-[44px]">
+        <div className="mx-auto max-w-[860px] px-4 py-6 md:px-[52px] md:py-[44px]">
           {showingDetail ? (
             <ProjectDetail
               project={view.projectDetail!.project}
@@ -365,6 +368,52 @@ export default function FeedPage() {
           ) : null}
         </div>
       </main>
+
+      {/* Mobile bottom tab bar */}
+      <MobileTabBar activeTab={view.tab} onTabChange={handleTabChange} />
     </div>
+  );
+}
+
+function MobileTabBar({ activeTab, onTabChange }: { activeTab: string; onTabChange: (tab: string) => void }) {
+  const tabs = [
+    { id: "profile", label: "Profile", icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    )},
+    { id: "feed", label: "For You", icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+    )},
+    { id: "leaderboard", label: "Board", icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5C7 4 7 7 7 7"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5C17 4 17 7 17 7"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+    )},
+    { id: "search", label: "Search", icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    )},
+  ];
+
+  return (
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-50 flex md:hidden border-t"
+      style={{
+        background: "rgba(6,10,18,0.98)",
+        borderColor: "var(--border-subtle)",
+        paddingBottom: "env(safe-area-inset-bottom)",
+      }}
+    >
+      {tabs.map((tab) => {
+        const active = activeTab === tab.id;
+        return (
+          <button
+            key={tab.id}
+            onClick={() => onTabChange(tab.id)}
+            className="flex-1 flex flex-col items-center gap-1 py-2.5 transition-colors"
+            style={{ color: active ? "#38ef7d" : "#42424f" }}
+          >
+            {tab.icon}
+            <span className="text-[10px] font-semibold">{tab.label}</span>
+          </button>
+        );
+      })}
+    </nav>
   );
 }

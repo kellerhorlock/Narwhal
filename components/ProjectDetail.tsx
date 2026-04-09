@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { generateGradientSVG, formatNumber, timeAgo } from "@/lib/helpers";
+import { createClient } from "@/lib/supabase";
+import { generateGradientSVG, formatNumber, timeAgo, estimateWorkTime } from "@/lib/helpers";
 import Avatar from "./Avatar";
 import EditProjectModal from "./EditProjectModal";
 import type { Project, Profile } from "@/lib/types";
-import { ArrowLeft, ExternalLink, Download, Pencil } from "lucide-react";
+import { ArrowLeft, ExternalLink, Download, Pencil, Eye, EyeOff } from "lucide-react";
 
 interface ProjectDetailProps {
   project: Project;
@@ -20,43 +21,51 @@ interface ProjectDetailProps {
 export default function ProjectDetail({ project: initialProject, profile, isOwner, onBack, onUserClick, currentUserId, allDownloads = [] }: ProjectDetailProps) {
   const [project, setProject] = useState(initialProject);
   const [showEdit, setShowEdit] = useState(false);
+  const [toggling, setToggling] = useState(false);
   const displayName = profile.display_name || profile.username;
   const hiddenStats = project.hidden_stats || [];
 
-  const isLaunched = project.status === "published";
+  const estHours = Math.round(project.commits * 0.65);
+  const workTimeDisplay = estimateWorkTime(project.commits);
 
-  const heroImage = project.thumbnail_url || generateGradientSVG(project.name, 860, 300);
+  async function toggleVisibility() {
+    setToggling(true);
+    const supabase = createClient();
+    const newStatus = project.status === "published" ? "stealth" : "published";
+    await supabase.from("projects").update({ status: newStatus }).eq("id", project.id);
+    setProject((p) => ({ ...p, status: newStatus }));
+    setToggling(false);
+  }
 
-  // Stats to show (filtered by hidden_stats)
+  // Stats to show (filtered by hidden_stats), with est work time added
   const allStats = [
     { key: "tokens", label: "Tokens Used", value: project.tokens_used, green: true },
     { key: "commits", label: "Commits", value: project.commits },
     { key: "lines_changed", label: "Lines Changed", value: project.lines_changed },
-    { key: "downloads", label: "Downloads", value: project.downloads },
+    { key: "est_work_time", label: "Est. Work Time", value: estHours, display: workTimeDisplay },
   ];
   const visibleStats = allStats.filter((s) => !hiddenStats.includes(s.key));
 
-  // "How it was built" paragraph
+  // AI insights paragraph
   const techStr = (project.tech_stack || []).join(", ");
-  const tokensPerCommit = project.commits > 0 ? Math.round(project.tokens_used / project.commits) : 0;
+  const insightParts: string[] = [];
 
-  let insightParts: string[] = [];
-  if (techStr) insightParts.push(`Built with ${techStr}`);
-  if (project.commits > 0) insightParts.push(`over ${formatNumber(project.commits)} commits`);
-  let insightText = insightParts.join(" ");
-  if (insightText) insightText += ".";
-  if (project.tokens_used > 0) {
-    insightText += ` ${formatNumber(project.tokens_used)} tokens consumed during development`;
-    if (tokensPerCommit > 0) insightText += `, averaging ${formatNumber(tokensPerCommit)} per commit`;
-    insightText += ".";
-  }
+  if (techStr) insightParts.push(`Built with ${techStr} over ${formatNumber(project.commits)} commits.`);
+  else if (project.commits > 0) insightParts.push(`Built over ${formatNumber(project.commits)} commits.`);
 
-  let insightExtra = "";
-  if (project.downloads > 100) {
-    insightExtra = "One of the most downloaded projects on Narwhal.";
-  } else if (project.commits > 200) {
-    insightExtra = "One of the most actively developed projects on the platform.";
-  }
+  if (estHours > 0) insightParts.push(`${estHours} hours of estimated development time.`);
+
+  if (project.tokens_used > 0) insightParts.push(`${formatNumber(project.tokens_used)} AI tokens consumed during development.`);
+
+  if (project.commits > 100) insightParts.push("One of the most actively developed projects on Narwhal.");
+
+  if (project.downloads > 0) insightParts.push(`Downloaded by ${formatNumber(project.downloads)} developers.`);
+
+  const insightText = insightParts.join(" ");
+
+  // Status badge
+  const statusLabel = project.status === "published" ? "Published" : project.status === "stealth" ? "Stealth" : "Building";
+  const statusColor = project.status === "published" ? "bg-accent/15 text-accent" : project.status === "stealth" ? "bg-white/10 text-white/60" : "bg-blue-500/15 text-blue-400";
 
   return (
     <div>
@@ -83,26 +92,41 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
 
       {/* Hero image */}
       <div
-        className="w-full rounded-2xl bg-cover bg-center mb-6"
+        className="w-full bg-cover bg-center mb-6"
         style={{
-          height: 300,
+          height: 280,
+          borderRadius: 20,
           backgroundImage: project.thumbnail_url
             ? `url("${project.thumbnail_url}")`
-            : `url("${generateGradientSVG(project.name, 860, 300)}")`,
+            : `url("${generateGradientSVG(project.name, 860, 280)}")`,
         }}
       />
 
-      {/* Name + badge */}
+      {/* Name + badge + visibility toggle */}
       <div className="flex items-center gap-3 mb-3 flex-wrap">
-        <h1 className="text-[28px] font-bold text-foreground">{project.name}</h1>
-        {isLaunched ? (
-          <span className="rounded-full bg-accent/15 px-3 py-1 text-xs font-semibold text-accent">
-            Launched
-          </span>
-        ) : (
-          <span className="rounded-full bg-blue-500/15 px-3 py-1 text-xs font-semibold text-blue-400">
-            Building
-          </span>
+        <h1 className="text-[30px] font-bold text-foreground">{project.name}</h1>
+        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusColor}`}>
+          {statusLabel}
+        </span>
+        {isOwner && (
+          <button
+            onClick={toggleVisibility}
+            disabled={toggling}
+            className="flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition-colors hover:bg-white/5 disabled:opacity-50"
+            style={{ borderColor: "var(--border-subtle)" }}
+          >
+            {project.status === "published" ? (
+              <>
+                <EyeOff size={14} className="text-muted" />
+                <span className="text-muted">Hide</span>
+              </>
+            ) : (
+              <>
+                <Eye size={14} style={{ color: "#38ef7d" }} />
+                <span style={{ color: "#38ef7d" }}>Publish</span>
+              </>
+            )}
+          </button>
         )}
       </div>
 
@@ -114,7 +138,15 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
         <Avatar name={displayName} size={28} />
         <span className="text-sm font-medium text-foreground">{displayName}</span>
         <span className="text-sm text-muted">@{profile.username}</span>
+        {project.created_at && (
+          <span className="text-sm text-muted">· Created {timeAgo(project.created_at)}</span>
+        )}
       </button>
+
+      {/* Description */}
+      <p className="text-[16px] text-foreground/70 mb-6 max-w-[640px]" style={{ lineHeight: 1.7 }}>
+        {project.description || "No description yet."}
+      </p>
 
       {/* Action buttons */}
       {(project.landing_url || project.download_url) && (
@@ -146,20 +178,13 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
         </div>
       )}
 
-      {/* Description */}
-      {project.description && (
-        <p className="text-[16px] text-foreground/70 mb-6 max-w-[600px]" style={{ lineHeight: 1.7 }}>
-          {project.description}
-        </p>
-      )}
-
-      {/* Stats */}
+      {/* Stats grid */}
       {visibleStats.length > 0 && (
-        <div className="flex gap-4 mb-6 flex-wrap">
+        <div className="grid grid-cols-4 gap-4 mb-6">
           {visibleStats.map((stat) => (
-            <div key={stat.key} className="rounded-xl border bg-card px-5 py-3.5 text-center min-w-[120px]" style={{ borderColor: "var(--border-subtle)" }}>
+            <div key={stat.key} className="rounded-xl border bg-card px-5 py-3.5 text-center" style={{ borderColor: "var(--border-subtle)" }}>
               <div className={`text-[20px] font-bold font-mono ${stat.green ? "text-accent" : "text-foreground"}`}>
-                {formatNumber(stat.value)}
+                {stat.display ? stat.display : (stat.value ? formatNumber(stat.value) : "\u2014")}
               </div>
               <div className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-muted">
                 {stat.label}
@@ -172,10 +197,10 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
       {/* Tech stack */}
       {(project.tech_stack || []).length > 0 && (
         <div className="mb-6">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted mb-3">Tech Stack</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted mb-3">Built with</h3>
           <div className="flex flex-wrap gap-2">
             {project.tech_stack.map((tech) => (
-              <span key={tech} className="rounded-full border bg-card px-3.5 py-1.5 text-sm text-foreground/70" style={{ borderColor: "var(--border-subtle)" }}>
+              <span key={tech} className="rounded-full border bg-card px-3.5 py-1.5 text-sm font-mono text-foreground/70" style={{ borderColor: "var(--border-subtle)" }}>
                 {tech}
               </span>
             ))}
@@ -183,22 +208,16 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
         </div>
       )}
 
-      {/* How it was built */}
+      {/* AI Insights */}
       {insightText && (
         <div className="rounded-xl border bg-card p-5 mb-6" style={{ borderColor: "var(--border-subtle)" }}>
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted mb-3">How it was built</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted mb-3">AI Insights</h3>
           <p className="text-sm text-foreground/70 leading-relaxed">{insightText}</p>
-          {insightExtra && (
-            <p className="text-sm text-accent/80 font-medium mt-2">{insightExtra}</p>
-          )}
         </div>
       )}
 
-      {/* Timestamps */}
+      {/* Last active */}
       <div className="flex gap-4 text-xs text-muted">
-        {project.created_at && (
-          <span>Created {new Date(project.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
-        )}
         {project.last_activity && (
           <span>Last active {timeAgo(project.last_activity)}</span>
         )}

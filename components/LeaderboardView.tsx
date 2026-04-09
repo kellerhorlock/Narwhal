@@ -29,9 +29,9 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
       const supabase = createClient();
 
       const [{ data: users }, { data: follows }, { data: projects }] = await Promise.all([
-        supabase.from("profiles").select("*").order("tokens_today", { ascending: false }),
+        supabase.from("profiles").select("*").order("total_tokens_used", { ascending: false }),
         supabase.from("follows").select("following_id").eq("follower_id", currentUserId),
-        supabase.from("projects").select("user_id, status, downloads"),
+        supabase.from("projects").select("user_id, status, downloads, tokens_used, commits"),
       ]);
 
       setAllUsers(users || []);
@@ -40,14 +40,18 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
       // Build per-user stats for builder score
       const pub: Record<string, number> = {};
       const dl: Record<string, number> = {};
+      const userTokensFromProjects: Record<string, number> = {};
+      const userCommitsFromProjects: Record<string, number> = {};
       for (const p of projects || []) {
         if (p.status === "published") pub[p.user_id] = (pub[p.user_id] || 0) + 1;
         dl[p.user_id] = (dl[p.user_id] || 0) + (p.downloads || 0);
+        userTokensFromProjects[p.user_id] = (userTokensFromProjects[p.user_id] || 0) + (p.tokens_used || 0);
+        userCommitsFromProjects[p.user_id] = (userCommitsFromProjects[p.user_id] || 0) + (p.commits || 0);
       }
       setUserPublished(pub);
       setUserDownloads(dl);
 
-      const totalTokens = (users || []).reduce((s, u) => s + u.total_tokens_used, 0);
+      const totalTokens = (projects || []).reduce((s, p) => s + (p.tokens_used || 0), 0);
       const shipped = (projects || []).filter((p) => p.status === "published").length;
       const totalDownloads = (projects || []).reduce((s, p) => s + (p.downloads || 0), 0);
       setCommunityStats({
@@ -127,7 +131,7 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
             actions={onTabChange ? [{ label: "Discover Builders", onClick: () => onTabChange("search"), primary: true }] : []}
           />
         ) : (
-          <EmptyState title="No builders yet" message="Be the first to start building!" />
+          <EmptyState title="No builders yet" message="Be the first to start building on Narwhal!" />
         )
       ) : (
         <>
@@ -166,6 +170,11 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
                 );
               })}
             </div>
+          )}
+
+          {/* Solo user message */}
+          {ranked.length === 1 && (
+            <p className="text-center text-sm text-muted mb-6">Be the next to join!</p>
           )}
 
           {/* Table */}

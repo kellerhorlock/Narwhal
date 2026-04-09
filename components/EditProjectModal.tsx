@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { createClient } from "@/lib/supabase";
 import { generateGradientSVG, hashString } from "@/lib/helpers";
 import type { Project } from "@/lib/types";
@@ -18,14 +18,20 @@ export default function EditProjectModal({ project, onClose, onSaved }: EditProj
   const [landingUrl, setLandingUrl] = useState(project.landing_url || "");
   const [downloadUrl, setDownloadUrl] = useState(project.download_url || "");
   const [techStack, setTechStack] = useState((project.tech_stack || []).join(", "));
-  const [status, setStatus] = useState<"active" | "published">(
-    project.status === "published" ? "published" : "active"
-  );
+  const [status, setStatus] = useState<"active" | "published" | "stealth">(project.status);
   const [thumbnailUrl, setThumbnailUrl] = useState(project.thumbnail_url || "");
   const [hiddenStats, setHiddenStats] = useState<string[]>(project.hidden_stats || []);
   const [saving, setSaving] = useState(false);
   const [gradientSeed, setGradientSeed] = useState(project.name);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    function handleEsc(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", handleEsc);
+    return () => document.removeEventListener("keydown", handleEsc);
+  }, [onClose]);
 
   const imagePreview = thumbnailUrl || generateGradientSVG(gradientSeed, 600, 200);
 
@@ -223,12 +229,13 @@ export default function EditProjectModal({ project, onClose, onSaved }: EditProj
           <span className="text-xs font-semibold uppercase tracking-wider text-muted mb-1.5 block">Status</span>
           <select
             value={status}
-            onChange={(e) => setStatus(e.target.value as "active" | "published")}
+            onChange={(e) => setStatus(e.target.value as "active" | "published" | "stealth")}
             className="w-full rounded-lg border bg-transparent px-3 py-2 text-sm text-foreground outline-none focus:border-accent/40 transition-colors"
             style={{ borderColor: "var(--border-subtle)", background: "var(--bg-primary)" }}
           >
             <option value="active">Building</option>
-            <option value="published">Launched</option>
+            <option value="published">Published</option>
+            <option value="stealth">Stealth</option>
           </select>
         </label>
 

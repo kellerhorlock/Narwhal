@@ -9,22 +9,22 @@ export function hashString(str: string): number {
 }
 
 const GRADIENT_PALETTES = [
-  ["#667eea", "#764ba2"],
-  ["#f093fb", "#f5576c"],
-  ["#4facfe", "#00f2fe"],
-  ["#43e97b", "#38f9d7"],
-  ["#fa709a", "#fee140"],
-  ["#a18cd1", "#fbc2eb"],
-  ["#fccb90", "#d57eeb"],
-  ["#e0c3fc", "#8ec5fc"],
-  ["#f5576c", "#ff6a88"],
-  ["#667eea", "#38ef7d"],
-  ["#ff9a9e", "#fad0c4"],
-  ["#a1c4fd", "#c2e9fb"],
-  ["#fddb92", "#d1fdff"],
-  ["#96fbc4", "#f9f586"],
-  ["#cd9cf2", "#f6f3ff"],
-  ["#e2b0ff", "#9f44d3"],
+  ["#667eea", "#5a3fbf", "#764ba2", "#9b59b6"],
+  ["#f093fb", "#e056a0", "#f5576c", "#ff6b81"],
+  ["#4facfe", "#2196f3", "#00b4d8", "#00f2fe"],
+  ["#43e97b", "#2ecc71", "#1abc9c", "#38f9d7"],
+  ["#fa709a", "#e74c7a", "#f39c12", "#fee140"],
+  ["#a18cd1", "#8e44ad", "#c39bd3", "#fbc2eb"],
+  ["#fccb90", "#e8a87c", "#c56cd6", "#d57eeb"],
+  ["#e0c3fc", "#b8a9c9", "#6c7ce4", "#8ec5fc"],
+  ["#f5576c", "#e74c3c", "#ff8a5c", "#ff6a88"],
+  ["#667eea", "#41b883", "#2dce89", "#38ef7d"],
+  ["#ff9a9e", "#ff6b6b", "#ee9ca7", "#fad0c4"],
+  ["#a1c4fd", "#6eb5ff", "#89d4cf", "#c2e9fb"],
+  ["#fddb92", "#f6d365", "#93f5ec", "#d1fdff"],
+  ["#96fbc4", "#74e8a5", "#c6f16e", "#f9f586"],
+  ["#cd9cf2", "#b47ede", "#d4aaff", "#f6f3ff"],
+  ["#e2b0ff", "#c77dff", "#7b2ff7", "#9f44d3"],
 ];
 
 export function generateGradientSVG(name: string, width = 400, height = 240): string {
@@ -37,17 +37,34 @@ export function generateGradientSVG(name: string, width = 400, height = 240): st
   const x2 = 50 + Math.cos(rad) * 50;
   const y2 = 50 + Math.sin(rad) * 50;
 
+  const stops = palette.map((color, i) => {
+    const offset = Math.round((i / (palette.length - 1)) * 100);
+    return `<stop offset="${offset}%" stop-color="${color}"/>`;
+  }).join("");
+
+  // Subtle noise texture via a semi-transparent fractal pattern
+  const noiseFilter = `<filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.08"/></feComponentTransfer></filter>`;
+
   return `data:image/svg+xml,${encodeURIComponent(
     `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
       <defs>
         <linearGradient id="g" x1="${x1}%" y1="${y1}%" x2="${x2}%" y2="${y2}%">
-          <stop offset="0%" stop-color="${palette[0]}"/>
-          <stop offset="100%" stop-color="${palette[1]}"/>
+          ${stops}
         </linearGradient>
+        ${noiseFilter}
       </defs>
       <rect width="${width}" height="${height}" fill="url(#g)"/>
+      <rect width="${width}" height="${height}" filter="url(#n)"/>
     </svg>`
   )}`;
+}
+
+export function estimateWorkTime(commits: number): string {
+  if (commits === 0) return "Just started";
+  const hours = commits * 0.65;
+  if (hours < 100) return `~${Math.round(hours)}h`;
+  const days = Math.round(hours / 8);
+  return `~${days}d`;
 }
 
 export function formatNumber(n: number | null | undefined): string {

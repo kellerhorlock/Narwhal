@@ -22,21 +22,35 @@ export default function SearchView({ onProjectClick, onUserClick }: SearchViewPr
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [users, setUsers] = useState<Profile[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [allProjects, setAllProjects] = useState<{ user_id: string; commits: number }[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       const supabase = createClient();
-      const [{ data: usersData }, { data: projectsData }] = await Promise.all([
+      const [{ data: usersData }, { data: projectsData }, { data: allProjectsData }] = await Promise.all([
         supabase.from("profiles").select("*").order("total_tokens_used", { ascending: false }),
         supabase.from("projects").select("*").eq("status", "published").order("last_activity", { ascending: false }),
+        supabase.from("projects").select("user_id, commits"),
       ]);
       setUsers(usersData || []);
       setProjects(projectsData || []);
+      setAllProjects(allProjectsData || []);
       setLoading(false);
     }
     load();
   }, []);
+
+  // Per-user stats
+  const userStats = useMemo(() => {
+    const stats: Record<string, { projectCount: number; totalCommits: number }> = {};
+    for (const p of allProjects) {
+      if (!stats[p.user_id]) stats[p.user_id] = { projectCount: 0, totalCommits: 0 };
+      stats[p.user_id].projectCount++;
+      stats[p.user_id].totalCommits += p.commits || 0;
+    }
+    return stats;
+  }, [allProjects]);
 
   // Tag counts
   const tagCounts = useMemo(() => {
@@ -123,6 +137,9 @@ export default function SearchView({ onProjectClick, onUserClick }: SearchViewPr
             {filteredUsers.map((user) => {
               const displayName = user.display_name || user.username;
               const showRing = user.streak_days >= 14;
+              const stats = userStats[user.id];
+              const projectCount = stats?.projectCount || 0;
+              const totalCommits = stats?.totalCommits || 0;
               return (
                 <button
                   key={user.id}
@@ -134,15 +151,15 @@ export default function SearchView({ onProjectClick, onUserClick }: SearchViewPr
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-semibold text-foreground">{displayName}</span>
                       {user.streak_days >= 7 && (
-                        <span className="text-xs text-orange-400">{user.streak_days}d 🔥</span>
+                        <span className="text-xs text-orange-400">{user.streak_days}d</span>
                       )}
                     </div>
                     <div className="text-xs text-muted">
-                      @{user.username} · {formatNumber(user.total_tokens_used)} tokens
+                      @{user.username} · {projectCount} project{projectCount !== 1 ? "s" : ""} · {formatNumber(totalCommits)} commits
                     </div>
                   </div>
                   <span className="text-sm font-mono font-semibold text-accent">
-                    {formatNumber(Math.round(user.total_tokens_used / 90))}/d
+                    {formatNumber(user.total_tokens_used)}
                   </span>
                 </button>
               );

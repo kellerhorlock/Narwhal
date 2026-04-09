@@ -59,16 +59,18 @@ export default function UserProfilePage() {
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
-      <Sidebar
-        activeTab="profile"
-        onTabChange={(tab) => {
-          if (tab === "profile") router.push("/feed");
-          else router.push(`/feed`);
-        }}
-        profile={currentUser}
-      />
-      <main className="ml-[240px] flex-1 overflow-y-auto min-h-screen" style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.008) 0px, transparent 200px)" }}>
-        <div className="mx-auto max-w-[860px] px-[52px] py-[44px]">
+      <div className="hidden md:block">
+        <Sidebar
+          activeTab="profile"
+          onTabChange={(tab) => {
+            if (tab === "profile") router.push("/feed");
+            else router.push(`/feed`);
+          }}
+          profile={currentUser}
+        />
+      </div>
+      <main className="md:ml-[240px] flex-1 overflow-y-auto min-h-screen" style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.008) 0px, transparent 200px)" }}>
+        <div className="mx-auto max-w-[860px] px-4 py-6 md:px-[52px] md:py-[44px]">
           {projectDetail ? (
             <ProjectDetail
               project={projectDetail.project}

@@ -1,37 +1,27 @@
 "use client";
 
-import { generateGradientSVG, formatNumber } from "@/lib/helpers";
+import { generateGradientSVG, formatNumber, estimateWorkTime } from "@/lib/helpers";
 import type { Project } from "@/lib/types";
-import { Lock, ArrowDown, GitCommit, Zap } from "lucide-react";
+import { Eye, EyeOff, Hammer } from "lucide-react";
 
 interface ProjectCardProps {
   project: Project;
   onClick?: () => void;
   onContextMenu?: (e: React.MouseEvent) => void;
   isStealth?: boolean;
+  showMenuButton?: boolean;
+  onMenuClick?: (e: React.MouseEvent) => void;
 }
 
-export default function ProjectCard({ project, onClick, onContextMenu, isStealth }: ProjectCardProps) {
+export default function ProjectCard({ project, onClick, onContextMenu, isStealth, showMenuButton, onMenuClick }: ProjectCardProps) {
   const bgImage = project.thumbnail_url
     ? `url("${project.thumbnail_url}")`
     : `url("${generateGradientSVG(project.name, 860, 220)}")`;
 
-  // Pick the most impressive stat
-  let statText = "";
-  let StatIcon = Zap;
-  if (project.downloads > 0) {
-    statText = `${formatNumber(project.downloads)} downloads`;
-    StatIcon = ArrowDown;
-  } else if (project.commits > 0) {
-    statText = `${formatNumber(project.commits)} commits`;
-    StatIcon = GitCommit;
-  } else if (project.tokens_used > 0) {
-    statText = `${formatNumber(project.tokens_used)} tokens`;
-    StatIcon = Zap;
-  }
-
-  const isLaunched = project.status === "published";
-  const isBuilding = project.status === "active";
+  const description = project.description || "No description yet";
+  const commitCount = project.commits || 0;
+  const workTime = estimateWorkTime(commitCount);
+  const statLine = commitCount > 0 ? `${formatNumber(commitCount)} commits · ${workTime} of work` : workTime;
 
   return (
     <div
@@ -53,7 +43,7 @@ export default function ProjectCard({ project, onClick, onContextMenu, isStealth
       <div
         className="absolute inset-0"
         style={{
-          background: "linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%)",
+          background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 40%, transparent 65%)",
           borderRadius: 20,
         }}
       />
@@ -63,44 +53,50 @@ export default function ProjectCard({ project, onClick, onContextMenu, isStealth
         <div
           className="absolute inset-0 z-10"
           style={{
-            background: "rgba(0,0,0,0.3)",
-            backdropFilter: "blur(4px)",
-            WebkitBackdropFilter: "blur(4px)",
+            background: "rgba(6,10,18,0.4)",
+            backdropFilter: "blur(2px)",
+            WebkitBackdropFilter: "blur(2px)",
             borderRadius: 20,
           }}
-        >
-          <div className="absolute top-4 right-4">
-            <Lock size={16} className="text-white/60" />
-          </div>
-        </div>
+        />
       )}
 
-      {/* Bottom-left: name + stat */}
-      <div className="absolute bottom-0 left-0 p-5 z-20">
+      {/* Three-dot menu button (top-right, for own profile cards) */}
+      {showMenuButton && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onMenuClick?.(e);
+          }}
+          className="absolute top-3 right-3 z-30 rounded-full bg-black/40 backdrop-blur-sm px-2 py-1 text-white/70 hover:text-white hover:bg-black/60 transition-colors text-lg leading-none"
+        >
+          &#x22EF;
+        </button>
+      )}
+
+      {/* Bottom-left: name + description + stat */}
+      <div className="absolute bottom-0 left-0 p-5 z-20 max-w-[75%]">
         <h3 className="text-[20px] font-bold text-white leading-tight">{project.name}</h3>
-        {statText && !isStealth && (
+        <p className="text-[13px] text-white/60 mt-1 line-clamp-2 leading-snug">
+          {description}
+        </p>
+        {!isStealth && (
           <div className="flex items-center gap-1.5 mt-1.5">
-            <StatIcon size={13} className="text-white/50" />
-            <span className="text-[13px] font-mono text-white/50">{statText}</span>
+            <span className="text-[13px] font-mono text-white/50">{statLine}</span>
           </div>
         )}
       </div>
 
-      {/* Bottom-right: status pill */}
-      {!isStealth && (
-        <div className="absolute bottom-5 right-5 z-20">
-          {isLaunched && (
-            <span className="rounded-full bg-accent/20 px-2.5 py-1 text-[11px] font-semibold text-accent backdrop-blur-sm">
-              Launched
-            </span>
-          )}
-          {isBuilding && (
-            <span className="rounded-full bg-blue-500/20 px-2.5 py-1 text-[11px] font-semibold text-blue-400 backdrop-blur-sm">
-              Building
-            </span>
-          )}
-        </div>
-      )}
+      {/* Bottom-right: visibility icon */}
+      <div className="absolute bottom-5 right-5 z-20">
+        {isStealth ? (
+          <EyeOff size={20} className="text-white/50" />
+        ) : project.status === "published" ? (
+          <Eye size={20} style={{ color: "#38ef7d" }} />
+        ) : (
+          <Hammer size={20} style={{ color: "#60a5fa" }} />
+        )}
+      </div>
     </div>
   );
 }

@@ -80,20 +80,25 @@ STEP 2 — FOR EACH PROJECT FOUND:
 Read the README.md (if it exists), the main config file (package.json, etc), and scan the file structure.
 Generate:
   - name: From config file or directory name
-  - description: Generate a compelling 1-2 sentence description (under 200 chars) that would make another developer want to check it out. Write it like a YC startup pitch — what does it do and why should anyone care? Don't be generic. Don't just list technologies. Focus on what makes it interesting or useful.
+  - description: Generate a compelling 1-2 sentence description (under 200 chars) that would make another developer want to check it out. Write it like a YC startup pitch — what does it do and why should anyone care? Don't be generic. Don't just list technologies. Focus on what makes it interesting or useful. THIS FIELD IS REQUIRED — always generate a description.
   - tech_stack: Array of technologies detected from dependencies and file extensions (e.g. ["Next.js", "Supabase", "TypeScript"])
   - commits: Run \`git log --oneline 2>/dev/null | wc -l\` (0 if not a git repo)
   - lines: Estimate total lines of source code (skip generated files, node_modules, etc)
+  - Also check if the project has a README.md with a screenshot or hero image URL. If so, include it as thumbnail_url.
+  - Check if the project has a live URL in package.json homepage field, or in a CNAME file, or in a vercel.json/netlify.toml. If found, include it as landing_url.
+  - Check if the project has a GitHub repo URL in package.json repository field. If found, include it as download_url.
+  - Estimate tokens consumed by calculating: (lines_of_code * 3) + (commits * 500). This is a rough approximation of AI-assisted development tokens.
 
 Present each project to me like this:
 📦 [name]
    [description]
    Stack: [tech_stack]
-   [commits] commits · [lines] lines
+   [commits] commits · [lines] lines · ~[estimated_tokens] tokens
+   URLs: [landing_url or "none"] | [download_url or "none"]
    Upload? (y/n)
 
 STEP 3 — UPLOAD APPROVED PROJECTS:
-For each project I approve, run this curl command:
+For each project I approve, run this curl command. Make sure to properly escape the description string in the JSON:
 
 curl -X POST '${syncUrl}' \\
   -H 'x-narwhal-key: ${apiKey}' \\
@@ -103,10 +108,15 @@ curl -X POST '${syncUrl}' \\
     "description": "[DESCRIPTION]",
     "tech_stack": [TECH_ARRAY],
     "status": "stealth",
-    "tokens_used": 0,
+    "tokens_used": [ESTIMATED_TOKENS],
     "commits": [COMMITS_COUNT],
-    "lines_changed": [LINES_COUNT]
+    "lines_changed": [LINES_COUNT],
+    "landing_url": "[URL_OR_NULL]",
+    "download_url": "[REPO_URL_OR_NULL]",
+    "last_activity": "now()"
   }'
+
+IMPORTANT: The description field MUST be included and properly JSON-escaped. Do not send null for description — always generate one.
 
 STEP 4 — INSTALL AUTO-SYNC:
 For each uploaded project that has a .git directory, create a post-commit hook:

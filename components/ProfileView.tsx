@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase";
-import { timeAgo, calculateBuilderScore, getPercentile } from "@/lib/helpers";
+import { timeAgo, calculateBuilderScore, getPercentile, formatNumber } from "@/lib/helpers";
 import Avatar from "./Avatar";
 import BuilderScoreBadge from "./BuilderScoreBadge";
 import StatsBar from "./StatsBar";
@@ -70,13 +70,13 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
       const { data: projectData } = await projectQuery;
       setProjects(projectData || []);
 
-      const { data: allUsers } = await supabase.from("profiles").select("total_tokens_used, streak_days, hours_this_month");
+      const { data: allUsers } = await supabase.from("profiles").select("id, total_tokens_used, streak_days, hours_this_month");
       const { data: allProjects } = await supabase.from("projects").select("user_id, status, downloads");
 
       if (allUsers && allProjects) {
         const scores = allUsers.map((u) => {
-          const pub = allProjects.filter((p) => p.user_id === u && p.status === "published").length;
-          const dl = allProjects.filter((p) => p.user_id === u).reduce((s, p) => s + safeNum(p.downloads), 0);
+          const pub = allProjects.filter((p) => p.user_id === u.id && p.status === "published").length;
+          const dl = allProjects.filter((p) => p.user_id === u.id).reduce((s, p) => s + safeNum(p.downloads), 0);
           return calculateBuilderScore(safeNum(u.total_tokens_used), pub, dl, safeNum(u.streak_days), safeNum(u.hours_this_month)).total;
         });
         setAllScores(scores);
@@ -130,6 +130,11 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
     setContextMenu({ x: e.clientX, y: e.clientY, project });
   }
 
+  function handleMenuClick(e: React.MouseEvent, project: Project) {
+    e.stopPropagation();
+    setContextMenu({ x: e.clientX, y: e.clientY, project });
+  }
+
   async function handlePublish(project: Project) {
     const supabase = createClient();
     await supabase.from("projects").update({ status: "published" }).eq("id", project.id);
@@ -164,14 +169,26 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
 
   const displayName = profile.display_name || profile.username;
   const streakDays = safeNum(profile.streak_days);
-  const hoursMonth = safeNum(profile.hours_this_month);
-  const totalTokens = safeNum(profile.total_tokens_used);
   const showStreakBadge = streakDays >= 7;
   const showRing = streakDays >= 14;
   const launchedCount = projects.filter((p) => p.status === "published").length;
   const totalDownloads = projects.reduce((sum, p) => sum + safeNum(p.downloads), 0);
 
-  const score = calculateBuilderScore(totalTokens, launchedCount, totalDownloads, streakDays, hoursMonth);
+  // Compute real stats from project data
+  const totalTokens = projects.reduce((sum, p) => sum + safeNum(p.tokens_used), 0);
+  const totalCommits = projects.reduce((sum, p) => sum + safeNum(p.commits), 0);
+
+  // Hours/mo: total commits * 0.65 / months since joined (min 1)
+  const monthsSinceJoined = Math.max(1, Math.ceil((Date.now() - new Date(profile.created_at).getTime()) / (1000 * 60 * 60 * 24 * 30)));
+  const hoursPerMonth = Math.round((totalCommits * 0.65) / monthsSinceJoined);
+
+  // Weekly drop data: projects active in last 7 days
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const recentProjects = projects.filter((p) => p.last_activity && p.last_activity >= sevenDaysAgo);
+  const weeklyTokens = recentProjects.reduce((s, p) => s + safeNum(p.tokens_used), 0);
+  const weeklyCommits = recentProjects.reduce((s, p) => s + safeNum(p.commits), 0);
+
+  const score = calculateBuilderScore(totalTokens, launchedCount, totalDownloads, streakDays, hoursPerMonth);
   const percentile = getPercentile(score.total, allScores);
 
   return (
@@ -229,7 +246,7 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
           { label: "Following", value: followingCount },
           { label: "Launched", value: launchedCount },
           { label: "3mo Tokens", value: totalTokens > 0 ? totalTokens : null, green: true, mono: true },
-          { label: "Hours/mo", value: hoursMonth > 0 ? hoursMonth : null, mono: true },
+          { label: "Hours/mo", value: hoursPerMonth > 0 ? hoursPerMonth : null, mono: true },
           { label: "Streak", value: streakDays > 0 ? `${streakDays}d` : null, mono: true },
           { label: "Downloads", value: totalDownloads > 0 ? totalDownloads : null, mono: true },
         ]}
@@ -268,12 +285,10 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
                 key={project.id}
                 project={project}
                 isStealth={project.status === "stealth"}
-                onClick={() => {
-                  if (project.status !== "stealth") {
-                    onProjectClick(project);
-                  }
-                }}
+                onClick={() => onProjectClick(project)}
                 onContextMenu={isOwnProfile ? (e) => handleContextMenu(e, project) : undefined}
+                showMenuButton={isOwnProfile}
+                onMenuClick={isOwnProfile ? (e) => handleMenuClick(e, project) : undefined}
               />
             ))}
           </div>
