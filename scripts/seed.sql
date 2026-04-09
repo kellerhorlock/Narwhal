@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════
 -- Narwhal Platform — Seed Data
 -- 25 profiles, 58 projects, ~58 follows
--- Tokens are calculated live by frontend: (lines_changed * 80) + (commits * 25000)
+-- Tokens are calculated live by frontend: commits * 25000
 -- All token fields are 0.
 -- ═══════════════════════════════════════════════════════════════
 

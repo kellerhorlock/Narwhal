@@ -65,7 +65,7 @@ export default function SetupView({ userId }: SetupViewProps) {
     fetchApiKey();
   }, []);
 
-  const syncUrl = "https://narwhal-five.vercel.app/api/sync";
+  const syncUrl = "https://narwhal.codes/api/sync";
 
   const prompt = `Connect my coding projects to Narwhal (narwhal.codes). Be thorough — I want RICH profiles.
 
