@@ -67,79 +67,139 @@ export default function SetupView({ userId }: SetupViewProps) {
 
   const syncUrl = "https://narwhal-five.vercel.app/api/sync";
 
-  const prompt = `I need you to connect my coding projects to my Narwhal profile (narwhal.dev — a social platform for builders).
+  const prompt = `I need you to fully connect my coding projects to Narwhal (narwhal.codes), my builder profile.
 
-STEP 1 — SCAN FOR PROJECTS:
-Search these directories for coding projects: ~/Desktop, ~/Documents, ~/Projects, ~/repos, ~/code, ~/dev, and ~/.
-A "project" is any directory containing: package.json, Cargo.toml, pyproject.toml, go.mod, Gemfile, requirements.txt, pubspec.yaml, composer.json, or a .git directory.
-Skip node_modules, .next, __pycache__, venv, dist, build, and hidden directories.
-Skip any project named 'vibefeed' or 'narwhal' — that's this platform itself.
+IMPORTANT: Be thorough. For each project, I want a RICH profile — not just a name. Take your time.
+
+STEP 0 — WARM UP:
+curl -s ${syncUrl} > /dev/null 2>&1
+Wait 2 seconds.
+
+STEP 1 — FIND MY CLAUDE TOKEN USAGE:
+Check if ~/.claude/usage.json or ~/.claude/stats.json or ~/.claude/projects/ exists.
+If so, read the total token usage across all sessions. Store this number as MY_TOTAL_TOKENS.
+Also check ~/.config/claude/ and ~/.local/share/claude/ as alternative locations.
+If you find per-project token data, map it to project directories.
+If no Claude usage data is found, set MY_TOTAL_TOKENS to 0.
+
+STEP 2 — SCAN FOR PROJECTS:
+Search these directories: ~/Desktop, ~/Documents, ~/Projects, ~/repos, ~/code, ~/dev
+A project is any directory containing: package.json, Cargo.toml, pyproject.toml, go.mod, Gemfile, requirements.txt, pubspec.yaml, composer.json, or a .git directory.
+Skip: node_modules, .next, __pycache__, venv, dist, build, hidden directories, and any project named 'vibefeed' or 'narwhal'.
 Do NOT recurse deeper than 3 levels.
 
-STEP 2 — FOR EACH PROJECT FOUND:
-Read the README.md (if it exists), the main config file (package.json, etc), and scan the file structure.
-Generate:
-  - name: From config file or directory name
-  - description: Generate a compelling 1-2 sentence description (under 200 chars) that would make another developer want to check it out. Write it like a YC startup pitch — what does it do and why should anyone care? Don't be generic. Don't just list technologies. Focus on what makes it interesting or useful. THIS FIELD IS REQUIRED — always generate a description.
-  - tech_stack: Array of technologies detected from dependencies and file extensions (e.g. ["Next.js", "Supabase", "TypeScript"])
-  - commits: Run \`git log --oneline 2>/dev/null | wc -l\` (0 if not a git repo)
-  - lines: Estimate total lines of source code (skip generated files, node_modules, etc)
-  - Also check if the project has a README.md with a screenshot or hero image URL. If so, include it as thumbnail_url.
-  - Check if the project has a live URL in package.json homepage field, or in a CNAME file, or in a vercel.json/netlify.toml. If found, include it as landing_url.
-  - Check if the project has a GitHub repo URL in package.json repository field. If found, include it as download_url.
-  - Estimate tokens consumed by calculating: (lines_of_code * 3) + (commits * 500). This is a rough approximation of AI-assisted development tokens.
+STEP 3 — FOR EACH PROJECT, GATHER RICH DATA:
 
-Present each project to me like this:
+A) BASIC INFO:
+   - name: From package.json name field, or directory name
+   - commits: Run \`git log --oneline 2>/dev/null | wc -l | tr -d ' '\`
+   - lines: Run \`find . -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.jsx' -o -name '*.py' -o -name '*.rs' -o -name '*.go' -o -name '*.swift' -o -name '*.java' -o -name '*.css' | grep -v node_modules | grep -v .next | xargs wc -l 2>/dev/null | tail -1 | tr -d ' ' | cut -d't' -f1\`
+   - tech_stack: Detect from dependencies (package.json deps, requirements.txt, Cargo.toml, etc) AND file extensions. Be specific — say "Next.js" not just "JavaScript", say "Supabase" if you see @supabase in deps.
+
+B) DESCRIPTION — THIS IS CRITICAL:
+   Read the README.md (first 100 lines), the package.json description, and scan the main source files.
+   Write a compelling 1-2 sentence description (under 200 chars) that would make a developer want to click.
+   Write it like a YC pitch — what it does and why anyone should care. NOT generic. NOT just listing tech.
+   BAD: "A Next.js application with Supabase backend"
+   GOOD: "Smart scheduling for medical practices. Reduces no-shows by 40% with AI-powered reminders."
+
+C) FIND A THUMBNAIL IMAGE:
+   Check in order:
+   1. Look for screenshots in README.md — any markdown image links like ![](screenshot.png) or ![](docs/preview.png)
+   2. Check for /public/og-image.png, /public/og.png, /public/screenshot.png, /public/preview.png
+   3. Check for any .png or .jpg in /public/, /assets/, /docs/, /screenshots/ (pick the first one)
+   4. If the project has a live URL (see below), note it for thumbnail generation
+   5. If nothing found, leave thumbnail_url as null (the app generates a gradient fallback)
+   For any local image found, read it and convert to a base64 data URL: data:image/png;base64,[BASE64_DATA]
+
+D) FIND LIVE URLs:
+   Check in order for a deployed/live URL:
+   1. package.json "homepage" field
+   2. A CNAME file in the root or /public
+   3. vercel.json or .vercel/project.json for Vercel deployments
+   4. netlify.toml for Netlify deployments
+   5. \`git remote -v\` and check if it's on GitHub — construct https://github.com/[user]/[repo]
+   Store the live site URL as landing_url and the repo URL as download_url.
+
+E) ESTIMATE TOKENS:
+   If per-project Claude token data was found in Step 1, use that.
+   Otherwise estimate: (lines_of_code * 3) + (commits * 500)
+   This approximates AI-assisted development effort.
+
+STEP 4 — PRESENT EACH PROJECT FOR APPROVAL:
+Show each project like this:
+
 📦 [name]
    [description]
    Stack: [tech_stack]
-   [commits] commits · [lines] lines · ~[estimated_tokens] tokens
-   URLs: [landing_url or "none"] | [download_url or "none"]
+   [commits] commits · [lines] lines · ~[tokens] tokens
+   🌐 Landing: [landing_url or "none found"]
+   📂 Repo: [download_url or "none found"]
+   🖼️ Image: [found/not found]
    Upload? (y/n)
 
-STEP 3 — UPLOAD APPROVED PROJECTS:
-For each project I approve, run this curl command. Make sure to properly escape the description string in the JSON:
+STEP 5 — UPLOAD APPROVED PROJECTS:
+For each approved project, run:
 
-curl -X POST '${syncUrl}' \\
+curl -s --max-time 30 -X POST '${syncUrl}' \\
   -H 'x-narwhal-key: ${apiKey}' \\
   -H 'Content-Type: application/json' \\
   -d '{
     "name": "[NAME]",
     "description": "[DESCRIPTION]",
-    "tech_stack": [TECH_ARRAY],
+    "tech_stack": [TECH_ARRAY_AS_JSON],
     "status": "stealth",
-    "tokens_used": [ESTIMATED_TOKENS],
-    "commits": [COMMITS_COUNT],
-    "lines_changed": [LINES_COUNT],
-    "landing_url": "[URL_OR_NULL]",
-    "download_url": "[REPO_URL_OR_NULL]",
+    "tokens_used": [TOKENS],
+    "commits": [COMMITS],
+    "lines_changed": [LINES],
+    "landing_url": "[LANDING_URL_OR_NULL]",
+    "download_url": "[DOWNLOAD_URL_OR_NULL]",
+    "thumbnail_url": "[THUMBNAIL_URL_OR_NULL]",
     "last_activity": "now()"
   }'
 
-IMPORTANT: The description field MUST be included and properly JSON-escaped. Do not send null for description — always generate one.
+Important: make sure ALL string values in the JSON are properly escaped. Description must not contain unescaped quotes.
+If a URL field is not found, use null (not the string "null").
+If curl fails, wait 5 seconds and retry once.
 
-STEP 4 — INSTALL AUTO-SYNC:
-For each uploaded project that has a .git directory, create a post-commit hook:
+STEP 6 — INSTALL AUTO-SYNC HOOKS:
+For each uploaded project with a .git directory, create TWO hooks:
 
-Create the file .git/hooks/post-commit with this content:
+File: .git/hooks/post-commit
+Content:
 #!/bin/sh
 COMMITS=$(git log --oneline | wc -l | tr -d ' ')
-curl -s -X PATCH '${syncUrl}' \\
+LINES=$(find . -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.jsx' -o -name '*.py' -o -name '*.rs' -o -name '*.go' -o -name '*.swift' | grep -v node_modules | grep -v .next | xargs wc -l 2>/dev/null | tail -1 | awk '{print $1}')
+TOKENS=0
+if [ -f ~/.claude/usage.json ]; then
+  TOKENS=$(cat ~/.claude/usage.json | grep -o '"total_tokens":[0-9]*' | head -1 | cut -d: -f2)
+fi
+curl -s --max-time 10 -X PATCH '${syncUrl}' \\
   -H 'x-narwhal-key: ${apiKey}' \\
   -H 'Content-Type: application/json' \\
-  -d "{\\"name\\": \\"[PROJECT_NAME]\\", \\"last_activity\\": \\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\\", \\"commits\\": $COMMITS}" 2>/dev/null &
+  -d "{\\"name\\": \\"[PROJECT_NAME]\\", \\"commits\\": $COMMITS, \\"lines_changed\\": \${LINES:-0}, \\"tokens_used\\": \${TOKENS:-0}, \\"last_activity\\": \\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\\"}" 2>/dev/null &
 
-Then run: chmod +x .git/hooks/post-commit
+Run: chmod +x .git/hooks/post-commit
 
-Also create a NEW hook: .git/hooks/post-checkout with the same content as post-commit. This way when the user starts working on a project (checks out a branch), it also pings Narwhal.
-Then run: chmod +x .git/hooks/post-checkout
+File: .git/hooks/post-checkout
+Same content as post-commit.
+Run: chmod +x .git/hooks/post-checkout
 
-STEP 5 — SUMMARY:
-After all uploads and hook installations, print:
+STEP 7 — UPDATE MY PROFILE TOKEN COUNT:
+If MY_TOTAL_TOKENS from Step 1 is > 0, update my profile:
+curl -s --max-time 10 -X PATCH '${syncUrl}' \\
+  -H 'x-narwhal-key: ${apiKey}' \\
+  -H 'Content-Type: application/json' \\
+  -d '{"update_profile_tokens": true, "total_tokens": [MY_TOTAL_TOKENS]}'
+
+STEP 8 — SUMMARY:
 ✅ Done! [X] projects uploaded to Narwhal.
-🔄 Auto-sync installed on [Y] projects.
-Your profile is live — visit narwhal.dev/profile to see it.
-From now on, every time you commit or switch branches in any of these projects, Narwhal will automatically update. No action needed.`;
+🔄 Auto-sync hooks installed on [Y] projects.
+🔑 Your token usage has been synced.
+📸 [Z] project thumbnails captured.
+
+Your profile is live at narwhal.codes
+Every future commit will automatically update your Narwhal profile. No action needed.`;
 
   async function handleCopy() {
     await navigator.clipboard.writeText(prompt);
@@ -237,11 +297,13 @@ From now on, every time you commit or switch branches in any of these projects, 
               <div className="mt-3 rounded-xl border border-border bg-card p-4 text-sm text-foreground/60 leading-relaxed max-w-xl">
                 <p className="mb-2">When you paste this prompt into your AI coding agent, it will:</p>
                 <ol className="list-decimal list-inside space-y-1.5 text-foreground/50">
+                  <li>Find your Claude token usage data (if available)</li>
                   <li>Scan your machine for all coding project directories</li>
-                  <li>Read each project&apos;s files to generate a compelling description and detect the tech stack</li>
+                  <li>Gather rich data: description, tech stack, thumbnails, URLs, token estimates</li>
                   <li>Show you each project and ask for your approval before uploading</li>
-                  <li>Upload approved projects to your Narwhal profile</li>
-                  <li>Install git hooks so future commits auto-sync to Narwhal</li>
+                  <li>Upload approved projects with full metadata to your Narwhal profile</li>
+                  <li>Install git hooks so future commits auto-sync stats</li>
+                  <li>Sync your total token usage to your profile</li>
                 </ol>
               </div>
             )}
@@ -280,11 +342,13 @@ From now on, every time you commit or switch branches in any of these projects, 
               <div className="mt-3 rounded-xl border border-border bg-card p-4 text-sm text-foreground/60 leading-relaxed max-w-xl">
                 <p className="mb-2">When you paste this prompt into your AI coding agent, it will:</p>
                 <ol className="list-decimal list-inside space-y-1.5 text-foreground/50">
+                  <li>Find your Claude token usage data (if available)</li>
                   <li>Scan your machine for all coding project directories</li>
-                  <li>Read each project&apos;s files to generate a compelling description and detect the tech stack</li>
+                  <li>Gather rich data: description, tech stack, thumbnails, URLs, token estimates</li>
                   <li>Show you each project and ask for your approval before uploading</li>
-                  <li>Upload approved projects to your Narwhal profile</li>
-                  <li>Install git hooks so future commits auto-sync to Narwhal</li>
+                  <li>Upload approved projects with full metadata to your Narwhal profile</li>
+                  <li>Install git hooks so future commits auto-sync stats</li>
+                  <li>Sync your total token usage to your profile</li>
                 </ol>
               </div>
             )}
