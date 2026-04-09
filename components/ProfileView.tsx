@@ -11,8 +11,8 @@ import ProjectCard from "./ProjectCard";
 import ContextMenu from "./ContextMenu";
 import EditProjectModal from "./EditProjectModal";
 import EmptyState from "./EmptyState";
-import type { Profile, Project } from "@/lib/types";
 import NarwhalIcon from "./NarwhalIcon";
+import type { Profile, Project } from "@/lib/types";
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -40,11 +40,8 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
   const [loading, setLoading] = useState(true);
   const isOwnProfile = !username;
 
-  // Context menu state
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; project: Project } | null>(null);
-  // Edit modal state
   const [editProject, setEditProject] = useState<Project | null>(null);
-  // Delete confirmation state
   const [deleteProject, setDeleteProject] = useState<Project | null>(null);
 
   useEffect(() => {
@@ -127,7 +124,6 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
     router.push("/");
   }
 
-  // Context menu handlers
   function handleContextMenu(e: React.MouseEvent, project: Project) {
     e.preventDefault();
     setContextMenu({ x: e.clientX, y: e.clientY, project });
@@ -163,28 +159,21 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
   }
 
   if (loading) {
-    return <div className="py-20 flex justify-center"><NarwhalIcon size={40} className="text-muted" animate="pulse" /></div>;
+    return <div className="py-20 flex justify-center"><NarwhalIcon size={40} style={{ color: "var(--text-muted)" }} animate="pulse" /></div>;
   }
 
   if (!profile) {
-    return <div className="text-muted py-20 text-center">User not found</div>;
+    return <div className="py-20 text-center text-sm" style={{ color: "var(--text-secondary)" }}>User not found</div>;
   }
 
   const displayName = profile.display_name || profile.username;
   const streakDays = safeNum(profile.streak_days);
-  const showStreakBadge = streakDays >= 7;
-  const showRing = streakDays >= 14;
   const launchedCount = projects.filter((p) => p.status === "published").length;
   const totalDownloads = projects.reduce((sum, p) => sum + safeNum(p.downloads), 0);
-
-  // Compute real stats from project data
   const totalCommits = projects.reduce((sum, p) => sum + safeNum(p.commits), 0);
   const totalTokens = totalCommits * 25000;
-
-  // Hours/mo: total commits * 0.65 / months since joined (min 1)
   const monthsSinceJoined = Math.max(1, Math.ceil((Date.now() - new Date(profile.created_at).getTime()) / (1000 * 60 * 60 * 24 * 30)));
   const hoursPerMonth = Math.round((totalCommits * 0.65) / monthsSinceJoined);
-
   const score = calculateBuilderScore(totalTokens, launchedCount, totalDownloads, streakDays, hoursPerMonth);
   const percentile = getPercentile(score.total, allScores);
 
@@ -192,32 +181,36 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
     <div>
       {/* Header */}
       <div className="flex items-start gap-5 mb-6">
-        <Avatar name={displayName} size={80} showRing={showRing} />
+        <Avatar name={displayName} size={72} />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3 flex-wrap">
-            <h2 className="text-[28px] font-bold text-foreground">{displayName}</h2>
+            <h2 className="text-[28px] font-bold" style={{ color: "var(--text-primary)" }}>{displayName}</h2>
             <BuilderScoreBadge score={score.total} percentile={percentile} size="lg" />
-            {showStreakBadge && (
-              <span className="rounded-full bg-orange-500/15 px-2.5 py-1 text-xs font-semibold text-orange-400">
+            {streakDays >= 7 && (
+              <span className="rounded-full px-2.5 py-1 text-xs font-semibold" style={{ background: "rgba(245, 158, 11, 0.1)", color: "var(--accent-warm)" }}>
                 {streakDays}d
               </span>
             )}
           </div>
-          <div className="text-sm text-muted mt-0.5">
-            @{profile.username}{profile.created_at ? ` · Joined ${timeAgo(profile.created_at)}` : ""}
+          <div className="mt-0.5 flex items-center gap-1">
+            <span className="text-[14px] font-mono" style={{ color: "var(--text-secondary)" }}>@{profile.username}</span>
+            {profile.created_at && (
+              <span className="text-[13px]" style={{ color: "var(--text-muted)" }}> · Joined {timeAgo(profile.created_at)}</span>
+            )}
           </div>
-          {profile.bio && <p className="text-sm text-foreground/70 mt-2 max-w-lg">{profile.bio}</p>}
+          {profile.bio && (
+            <p className="text-[14px] mt-2 max-w-[480px]" style={{ lineHeight: 1.6, color: "var(--text-secondary)" }}>{profile.bio}</p>
+          )}
         </div>
         <div className="flex gap-2">
           {!isOwnProfile && profile.id !== currentUserId && (
             <button
               onClick={toggleFollow}
-              className={`rounded-full px-5 py-2 text-sm font-semibold transition-colors duration-150 ${
-                isFollowing
-                  ? "border text-foreground hover:border-muted"
-                  : "bg-white text-black hover:opacity-80"
-              }`}
-              style={isFollowing ? { borderColor: "var(--border-subtle)" } : undefined}
+              className="rounded-full px-5 py-2 text-[13px] font-semibold transition-colors duration-150"
+              style={isFollowing
+                ? { border: "1px solid var(--border-ice)", color: "var(--text-primary)" }
+                : { background: "var(--accent-green)", color: "#050a12" }
+              }
             >
               {isFollowing ? "Following" : "Follow"}
             </button>
@@ -225,8 +218,10 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
           {isOwnProfile && (
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-muted hover:text-foreground transition-colors duration-150"
-              style={{ border: "1px solid var(--border-subtle)" }}
+              className="flex items-center gap-2 text-sm transition-colors duration-150"
+              style={{ color: "var(--text-secondary)" }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = "var(--text-primary)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-secondary)"; }}
             >
               <LogOut size={14} />
               Log Out
@@ -247,14 +242,14 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
 
       {/* Weekly drop card */}
       {projects.length > 0 && (
-        <div className="mt-6">
+        <div className="mt-4">
           <WeeklyDropCard projects={projects} followerDelta={0} />
         </div>
       )}
 
       {/* Projects */}
-      <div className="mt-4">
-        <h3 className="text-sm font-semibold text-muted uppercase tracking-wider mb-4">Projects</h3>
+      <div className="mt-8">
+        <h3 className="text-[11px] font-medium uppercase tracking-widest mb-4" style={{ color: "var(--text-muted)" }}>Projects</h3>
         {projects.length === 0 ? (
           isOwnProfile ? (
             <EmptyState
@@ -272,11 +267,12 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
             />
           )
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3">
             {projects.map((project) => (
               <ProjectCard
                 key={project.id}
                 project={project}
+                height={200}
                 isStealth={project.status === "stealth"}
                 onClick={() => onProjectClick(project)}
                 onContextMenu={isOwnProfile ? (e) => handleContextMenu(e, project) : undefined}
@@ -308,7 +304,6 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
         />
       )}
 
-      {/* Edit modal */}
       {editProject && (
         <EditProjectModal
           project={editProject}
@@ -317,32 +312,29 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
         />
       )}
 
-      {/* Delete confirmation */}
       {deleteProject && (
         <div
           className="fixed inset-0 z-[1000] flex items-center justify-center"
           style={{ background: "rgba(0,0,0,0.7)" }}
           onClick={(e) => { if (e.target === e.currentTarget) setDeleteProject(null); }}
         >
-          <div
-            className="rounded-2xl border p-6 max-w-[380px] w-full"
-            style={{ background: "var(--bg-primary)", borderColor: "var(--border-subtle)" }}
-          >
-            <h3 className="text-lg font-bold text-foreground mb-2">Delete Project</h3>
-            <p className="text-sm text-foreground/60 mb-5">
-              Are you sure you want to delete <strong className="text-foreground">{deleteProject.name}</strong>? This action cannot be undone.
+          <div className="rounded-2xl p-6 max-w-[380px] w-full" style={{ background: "var(--bg-deep)", border: "1px solid var(--border-ice)" }}>
+            <h3 className="text-lg font-bold mb-2" style={{ color: "var(--text-primary)" }}>Delete Project</h3>
+            <p className="text-sm mb-5" style={{ color: "var(--text-secondary)" }}>
+              Are you sure you want to delete <strong style={{ color: "var(--text-primary)" }}>{deleteProject.name}</strong>? This cannot be undone.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => handleDelete(deleteProject)}
-                className="flex-1 rounded-lg bg-red-500/90 py-2.5 text-sm font-semibold text-white hover:bg-red-500 transition-colors"
+                className="flex-1 rounded-lg py-2.5 text-sm font-semibold text-white transition-colors"
+                style={{ background: "rgba(239, 68, 68, 0.8)" }}
               >
                 Delete
               </button>
               <button
                 onClick={() => setDeleteProject(null)}
-                className="flex-1 rounded-lg border py-2.5 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors"
-                style={{ borderColor: "var(--border-subtle)" }}
+                className="flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors"
+                style={{ border: "1px solid var(--border-ice)", color: "var(--text-secondary)" }}
               >
                 Cancel
               </button>

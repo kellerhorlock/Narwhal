@@ -36,7 +36,6 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
     setToggling(false);
   }
 
-  // Stats to show (filtered by hidden_stats)
   const allStats = [
     { key: "tokens", label: "Tokens", value: stats.tokens, display: formatTokens(project.commits), green: true },
     { key: "commits", label: "Commits", value: project.commits },
@@ -45,34 +44,28 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
   ];
   const visibleStats = allStats.filter((s) => !hiddenStats.includes(s.key));
 
-  // AI insights paragraph
   const techStr = (project.tech_stack || []).join(", ");
   const insightParts: string[] = [];
-
   if (techStr) insightParts.push(`Built with ${techStr} over ${formatNumber(project.commits)} commits.`);
   else if (project.commits > 0) insightParts.push(`Built over ${formatNumber(project.commits)} commits.`);
-
   if (stats.hoursBuilding > 0) insightParts.push(`~${stats.hoursBuilding} hours of estimated development time.`);
-
   if (stats.tokens > 0) insightParts.push(`~${formatTokens(project.commits)} AI tokens consumed, averaging ~25K per commit.`);
-
   if (project.commits > 100) insightParts.push("One of the most actively developed projects on Narwhal.");
-
   if (project.downloads > 0) insightParts.push(`Downloaded by ${formatNumber(project.downloads)} developers.`);
-
   const insightText = insightParts.join(" ");
 
-  // Status badge
   const statusLabel = project.status === "published" ? "Published" : project.status === "stealth" ? "Stealth" : "Building";
-  const statusColor = project.status === "published" ? "bg-accent/15 text-accent" : project.status === "stealth" ? "bg-white/10 text-white/60" : "bg-blue-500/15 text-blue-400";
 
   return (
-    <div>
-      {/* Top row: back + edit */}
+    <div className="max-w-[680px]">
+      {/* Top row */}
       <div className="flex items-center justify-between mb-5">
         <button
           onClick={onBack}
-          className="flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors duration-150"
+          className="flex items-center gap-1.5 text-sm transition-colors duration-150"
+          style={{ color: "var(--text-secondary)" }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "var(--text-primary)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-secondary)"; }}
         >
           <ArrowLeft size={16} />
           Back
@@ -80,8 +73,10 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
         {isOwner && (
           <button
             onClick={() => setShowEdit(true)}
-            className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm text-muted hover:text-foreground transition-colors"
-            style={{ borderColor: "var(--border-subtle)" }}
+            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm transition-colors duration-150"
+            style={{ border: "1px solid var(--border-ice)", color: "var(--text-secondary)" }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "var(--text-primary)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-secondary)"; }}
           >
             <Pencil size={14} />
             Edit
@@ -93,36 +88,43 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
       <div
         className="w-full bg-cover bg-center mb-6"
         style={{
-          height: 280,
-          borderRadius: 20,
+          height: 260,
+          borderRadius: 16,
           backgroundImage: project.thumbnail_url
             ? `url("${project.thumbnail_url}")`
-            : `url("${generateGradientSVG(project.name, 860, 280)}")`,
+            : `url("${generateGradientSVG(project.name, 680, 260)}")`,
         }}
       />
 
-      {/* Name + badge + visibility toggle */}
+      {/* Name + badge + visibility */}
       <div className="flex items-center gap-3 mb-3 flex-wrap">
-        <h1 className="text-[30px] font-bold text-foreground">{project.name}</h1>
-        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusColor}`}>
+        <h1 className="text-[28px] font-bold" style={{ color: "var(--text-primary)" }}>{project.name}</h1>
+        <span
+          className="rounded-full px-3 py-1 text-xs font-semibold"
+          style={
+            project.status === "published"
+              ? { background: "rgba(52,211,153,0.1)", color: "var(--accent-green)" }
+              : { background: "var(--bg-surface)", color: "var(--text-secondary)" }
+          }
+        >
           {statusLabel}
         </span>
         {isOwner && (
           <button
             onClick={toggleVisibility}
             disabled={toggling}
-            className="flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition-colors hover:bg-white/5 disabled:opacity-50"
-            style={{ borderColor: "var(--border-subtle)" }}
+            className="flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition-colors duration-150 disabled:opacity-50"
+            style={{ border: "1px solid var(--border-ice)" }}
           >
             {project.status === "published" ? (
               <>
-                <EyeOff size={14} className="text-muted" />
-                <span className="text-muted">Hide</span>
+                <EyeOff size={14} style={{ color: "var(--text-secondary)" }} />
+                <span style={{ color: "var(--text-secondary)" }}>Hide</span>
               </>
             ) : (
               <>
-                <Eye size={14} style={{ color: "#38ef7d" }} />
-                <span style={{ color: "#38ef7d" }}>Publish</span>
+                <Eye size={14} style={{ color: "var(--accent-green)" }} />
+                <span style={{ color: "var(--accent-green)" }}>Publish</span>
               </>
             )}
           </button>
@@ -132,18 +134,17 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
       {/* Builder info */}
       <button
         onClick={() => onUserClick(profile.username)}
-        className="flex items-center gap-2.5 mb-5 hover:opacity-80 transition-opacity"
+        className="flex items-center gap-2.5 mb-5 transition-opacity duration-150 hover:opacity-80"
       >
-        <Avatar name={displayName} size={28} />
-        <span className="text-sm font-medium text-foreground">{displayName}</span>
-        <span className="text-sm text-muted">@{profile.username}</span>
+        <Avatar name={displayName} size={24} />
+        <span className="text-sm font-mono" style={{ color: "var(--text-secondary)" }}>@{profile.username}</span>
         {project.created_at && (
-          <span className="text-sm text-muted">· Created {timeAgo(project.created_at)}</span>
+          <span className="text-[13px]" style={{ color: "var(--text-muted)" }}>· Created {timeAgo(project.created_at)}</span>
         )}
       </button>
 
       {/* Description */}
-      <p className="text-[16px] text-foreground/70 mb-6 max-w-[640px]" style={{ lineHeight: 1.7 }}>
+      <p className="text-[15px] mb-6 max-w-[600px]" style={{ lineHeight: 1.7, color: "var(--text-secondary)" }}>
         {project.description || "No description yet."}
       </p>
 
@@ -155,8 +156,8 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
               href={project.landing_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-black transition-opacity hover:opacity-90"
-              style={{ background: "var(--accent-green)" }}
+              className="flex items-center gap-2 rounded-lg px-4 py-2.5 text-[13px] font-medium transition-opacity duration-150 hover:opacity-90"
+              style={{ background: "var(--accent-green)", color: "#050a12" }}
             >
               Visit Project
               <ExternalLink size={14} />
@@ -167,8 +168,8 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
               href={project.download_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold text-foreground/80 hover:text-foreground transition-colors"
-              style={{ borderColor: "var(--border-subtle)" }}
+              className="flex items-center gap-2 rounded-lg px-4 py-2.5 text-[13px] font-medium transition-colors duration-150"
+              style={{ border: "1px solid var(--border-ice)", color: "var(--text-secondary)" }}
             >
               Download
               <Download size={14} />
@@ -179,13 +180,13 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
 
       {/* Stats grid */}
       {visibleStats.length > 0 && (
-        <div className="grid grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-4 gap-3 mb-6">
           {visibleStats.map((stat) => (
-            <div key={stat.key} className="rounded-xl border bg-card px-5 py-3.5 text-center" style={{ borderColor: "var(--border-subtle)" }}>
-              <div className={`text-[20px] font-bold font-mono ${stat.green ? "text-accent" : "text-foreground"}`}>
+            <div key={stat.key} className="rounded-lg px-4 py-3 text-center" style={{ background: "var(--bg-surface)" }}>
+              <div className="text-[18px] font-bold font-mono" style={{ color: stat.green ? "var(--accent-green)" : "var(--text-primary)" }}>
                 {stat.display ? stat.display : (stat.value ? formatNumber(stat.value) : "\u2014")}
               </div>
-              <div className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-muted">
+              <div className="mt-0.5 text-[9px] font-medium uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
                 {stat.label}
               </div>
             </div>
@@ -196,10 +197,14 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
       {/* Tech stack */}
       {(project.tech_stack || []).length > 0 && (
         <div className="mb-6">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted mb-3">Built with</h3>
+          <h3 className="text-[11px] font-medium uppercase tracking-widest mb-3" style={{ color: "var(--text-muted)" }}>Built with</h3>
           <div className="flex flex-wrap gap-2">
             {project.tech_stack.map((tech) => (
-              <span key={tech} className="rounded-full border bg-card px-3.5 py-1.5 text-sm font-mono text-foreground/70" style={{ borderColor: "var(--border-subtle)" }}>
+              <span
+                key={tech}
+                className="rounded-lg px-3 py-1.5 text-[12px] font-mono"
+                style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)", color: "var(--text-secondary)" }}
+              >
                 {tech}
               </span>
             ))}
@@ -209,17 +214,14 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
 
       {/* AI Insights */}
       {insightText && (
-        <div className="rounded-xl border bg-card p-5 mb-6" style={{ borderColor: "var(--border-subtle)" }}>
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted mb-3">AI Insights</h3>
-          <p className="text-sm text-foreground/70 leading-relaxed">{insightText}</p>
+        <div className="mb-6 pl-4" style={{ borderLeft: "2px solid rgba(52, 211, 153, 0.1)" }}>
+          <p className="text-[13px] italic" style={{ lineHeight: 1.7, color: "var(--text-secondary)" }}>{insightText}</p>
         </div>
       )}
 
       {/* Last active */}
-      <div className="flex gap-4 text-xs text-muted">
-        {project.last_activity && (
-          <span>Last active {timeAgo(project.last_activity)}</span>
-        )}
+      <div className="text-xs" style={{ color: "var(--text-muted)" }}>
+        {project.last_activity && <span>Last active {timeAgo(project.last_activity)}</span>}
       </div>
 
       {/* Edit modal */}

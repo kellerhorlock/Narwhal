@@ -10,21 +10,21 @@ interface EmptyStateProps {
 
 export default function EmptyState({ title, message, actions }: EmptyStateProps) {
   return (
-    <div className="rounded-xl border border-border bg-card py-20 px-8 text-center">
-      <NarwhalIcon size={64} className="mx-auto mb-5 text-muted/30 animate-narwhal-float" />
-      <p className="text-[20px] font-semibold text-foreground mb-2">{title}</p>
-      <p className="text-sm text-muted mb-8 max-w-sm mx-auto">{message}</p>
+    <div className="rounded-xl py-20 px-8 text-center" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)" }}>
+      <NarwhalIcon size={64} className="mx-auto mb-5" style={{ color: "var(--text-muted)" }} animate="float" />
+      <p className="text-[20px] font-bold mb-2" style={{ color: "var(--text-primary)" }}>{title}</p>
+      <p className="text-sm mb-8 max-w-sm mx-auto" style={{ color: "var(--text-secondary)" }}>{message}</p>
       {actions && actions.length > 0 && (
         <div className="flex items-center justify-center gap-3">
           {actions.map((action) => (
             <button
               key={action.label}
               onClick={action.onClick}
-              className={`rounded-full px-5 py-2 text-sm font-semibold transition-all duration-150 ${
-                action.primary
-                  ? "bg-white text-black hover:opacity-80"
-                  : "border border-border text-foreground hover:border-muted"
-              }`}
+              className="rounded-full px-5 py-2 text-sm font-semibold transition-all duration-150"
+              style={action.primary
+                ? { background: "var(--accent-green)", color: "#050a12" }
+                : { border: "1px solid var(--border-ice)", color: "var(--text-primary)" }
+              }
             >
               {action.label}
             </button>

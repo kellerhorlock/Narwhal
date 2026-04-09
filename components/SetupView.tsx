@@ -182,28 +182,29 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
 
   return (
     <div>
-      <div className="mb-6" style={{ filter: "drop-shadow(0 0 20px rgba(56, 239, 125, 0.15))" }}>
-        <NarwhalIcon size={80} className="text-white" animate="fade-in" />
+      <div className="mb-6" style={{ filter: "drop-shadow(0 0 20px rgba(52, 211, 153, 0.15))" }}>
+        <NarwhalIcon size={80} style={{ color: "var(--text-primary)" }} animate="fade-in" />
       </div>
-      <h1 className="font-serif italic text-3xl text-foreground mb-2">
+      <h1 className="font-serif italic text-3xl mb-2" style={{ color: "var(--text-primary)" }}>
         You&apos;re in. Let&apos;s load your work.
       </h1>
-      <p className="text-sm text-muted mb-10 max-w-xl leading-relaxed">
+      <p className="text-sm mb-10 max-w-xl leading-relaxed" style={{ color: "var(--text-secondary)" }}>
         Copy this prompt and paste it into Claude Code, Cursor, or any AI coding tool.
         It will find all your projects and sync them to Narwhal automatically.
       </p>
 
       {/* Content block */}
       {keyLoading ? (
-        <div className="rounded-xl border border-border bg-card py-20 text-center text-muted">
+        <div className="rounded-xl py-20 text-center" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)", color: "var(--text-secondary)" }}>
           Loading credentials...
         </div>
       ) : keyError ? (
-        <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-6 text-center">
-          <p className="text-sm text-red-400 mb-3">{keyError}</p>
+        <div className="rounded-xl p-6 text-center" style={{ background: "var(--bg-surface)", border: "1px solid rgba(239, 68, 68, 0.2)" }}>
+          <p className="text-sm mb-3" style={{ color: "#f87171" }}>{keyError}</p>
           <button
             onClick={fetchApiKey}
-            className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-card-hover transition-colors"
+            className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors duration-150"
+            style={{ border: "1px solid var(--border-ice)", color: "var(--text-primary)" }}
           >
             <RefreshCw size={14} />
             Retry
@@ -214,11 +215,11 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
           {/* Top copy button */}
           <button
             onClick={handleCopy}
-            className={`w-full flex items-center justify-center gap-2.5 rounded-xl py-3.5 text-sm font-semibold transition-all duration-200 mb-4 ${
-              copied
-                ? "bg-accent/15 border border-accent/30 text-accent"
-                : "bg-accent text-black hover:opacity-90"
-            }`}
+            className="w-full flex items-center justify-center gap-2.5 rounded-xl py-3.5 text-sm font-semibold transition-all duration-200 mb-4"
+            style={copied
+              ? { background: "rgba(52, 211, 153, 0.1)", border: "1px solid rgba(52, 211, 153, 0.2)", color: "var(--accent-green)" }
+              : { background: "var(--accent-green)", color: "#050a12" }
+            }
           >
             {copied ? <Check size={16} /> : <Copy size={16} />}
             {copied ? "Copied! Now paste it into your coding agent" : "Copy to Clipboard"}
@@ -228,17 +229,18 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
           <div className="mb-5">
             <button
               onClick={() => setShowExplainerTop(!showExplainerTop)}
-              className="flex items-center gap-2 text-sm font-medium text-muted hover:text-foreground transition-colors"
+              className="flex items-center gap-2 text-sm font-medium transition-colors duration-150"
+              style={{ color: "var(--text-secondary)" }}
             >
               {showExplainerTop ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
               What this does
             </button>
             {showExplainerTop && (
-              <div className="mt-3 rounded-xl border border-border bg-card p-4 text-sm text-foreground/60 leading-relaxed max-w-xl">
-                <p className="mb-2">When you paste this prompt into your AI coding agent, it will:</p>
-                <ol className="list-decimal list-inside space-y-1.5 text-foreground/50">
+              <div className="mt-3 rounded-xl p-4 text-sm leading-relaxed max-w-xl" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)" }}>
+                <p className="mb-2" style={{ color: "var(--text-secondary)" }}>When you paste this prompt into your AI coding agent, it will:</p>
+                <ol className="list-decimal list-inside space-y-1.5" style={{ color: "var(--text-muted)" }}>
                   <li>Scan your machine for all coding project directories</li>
-                  <li>Gather rich data: description, tech stack, thumbnails, URLs, commits, lines of code</li>
+                  <li>Gather rich data: description, tech stack, thumbnails, URLs, commits</li>
                   <li>Show you each project and ask for your approval before uploading</li>
                   <li>Upload approved projects with full metadata to your Narwhal profile</li>
                   <li>Install git hooks so future commits auto-sync stats</li>
@@ -248,8 +250,8 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
           </div>
 
           {/* Prompt block */}
-          <div className="rounded-xl border border-border overflow-hidden mb-4" style={{ background: "rgba(6, 10, 18, 0.9)" }}>
-            <pre className="p-5 text-[13px] text-foreground/60 font-mono leading-relaxed overflow-x-auto">
+          <div className="rounded-xl overflow-hidden mb-4" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)" }}>
+            <pre className="p-5 text-[13px] font-mono leading-relaxed overflow-x-auto" style={{ color: "var(--text-secondary)" }}>
               {prompt}
             </pre>
           </div>
@@ -257,11 +259,11 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
           {/* Bottom copy button */}
           <button
             onClick={handleCopy}
-            className={`w-full flex items-center justify-center gap-2.5 rounded-xl py-3.5 text-sm font-semibold transition-all duration-200 ${
-              copied
-                ? "bg-accent/15 border border-accent/30 text-accent"
-                : "bg-accent text-black hover:opacity-90"
-            }`}
+            className="w-full flex items-center justify-center gap-2.5 rounded-xl py-3.5 text-sm font-semibold transition-all duration-200"
+            style={copied
+              ? { background: "rgba(52, 211, 153, 0.1)", border: "1px solid rgba(52, 211, 153, 0.2)", color: "var(--accent-green)" }
+              : { background: "var(--accent-green)", color: "#050a12" }
+            }
           >
             {copied ? <Check size={16} /> : <Copy size={16} />}
             {copied ? "Copied! Now paste it into your coding agent" : "Copy to Clipboard"}
@@ -271,17 +273,18 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
           <div className="mt-5 mb-6">
             <button
               onClick={() => setShowExplainerBottom(!showExplainerBottom)}
-              className="flex items-center gap-2 text-sm font-medium text-muted hover:text-foreground transition-colors"
+              className="flex items-center gap-2 text-sm font-medium transition-colors duration-150"
+              style={{ color: "var(--text-secondary)" }}
             >
               {showExplainerBottom ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
               What this does
             </button>
             {showExplainerBottom && (
-              <div className="mt-3 rounded-xl border border-border bg-card p-4 text-sm text-foreground/60 leading-relaxed max-w-xl">
-                <p className="mb-2">When you paste this prompt into your AI coding agent, it will:</p>
-                <ol className="list-decimal list-inside space-y-1.5 text-foreground/50">
+              <div className="mt-3 rounded-xl p-4 text-sm leading-relaxed max-w-xl" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)" }}>
+                <p className="mb-2" style={{ color: "var(--text-secondary)" }}>When you paste this prompt into your AI coding agent, it will:</p>
+                <ol className="list-decimal list-inside space-y-1.5" style={{ color: "var(--text-muted)" }}>
                   <li>Scan your machine for all coding project directories</li>
-                  <li>Gather rich data: description, tech stack, thumbnails, URLs, commits, lines of code</li>
+                  <li>Gather rich data: description, tech stack, thumbnails, URLs, commits</li>
                   <li>Show you each project and ask for your approval before uploading</li>
                   <li>Upload approved projects with full metadata to your Narwhal profile</li>
                   <li>Install git hooks so future commits auto-sync stats</li>
@@ -291,27 +294,29 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
           </div>
 
           {/* API Key display */}
-          <div className="rounded-xl border border-border bg-card p-4 mb-10">
+          <div className="rounded-xl p-4 mb-10" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)" }}>
             <div className="flex items-center gap-2 mb-2">
-              <Key size={14} className="text-accent" />
-              <span className="text-xs font-semibold uppercase tracking-wider text-muted">Your API Key</span>
+              <Key size={14} style={{ color: "var(--accent-green)" }} />
+              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Your API Key</span>
             </div>
             <div className="flex items-center gap-3">
-              <code className="flex-1 text-sm font-mono text-foreground/70 break-all">{apiKey}</code>
+              <code className="flex-1 text-sm font-mono break-all" style={{ color: "var(--text-secondary)" }}>{apiKey}</code>
               <button
                 onClick={handleCopyKey}
-                className="flex-shrink-0 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted hover:text-foreground transition-colors"
+                className="flex-shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors duration-150"
+                style={{ border: "1px solid var(--border-ice)", color: "var(--text-secondary)" }}
               >
                 {keyCopied ? <Check size={12} className="inline" /> : <Copy size={12} className="inline" />}
                 {keyCopied ? " Copied" : " Copy"}
               </button>
             </div>
             <div className="flex items-center justify-between mt-3">
-              <span className="text-[11px] text-muted">This key never expires. Keep it private.</span>
+              <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>This key never expires. Keep it private.</span>
               <button
                 onClick={regenerateKey}
                 disabled={regenerating}
-                className="inline-flex items-center gap-1.5 text-[11px] text-muted hover:text-foreground transition-colors disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 text-[11px] transition-colors duration-150 disabled:opacity-50"
+                style={{ color: "var(--text-secondary)" }}
               >
                 <RefreshCw size={11} className={regenerating ? "animate-spin" : ""} />
                 {regenerating ? "Regenerating..." : "Regenerate Key"}
@@ -322,11 +327,11 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
       )}
 
       {/* Divider */}
-      <div className="border-t border-border mb-10" />
+      <div className="mb-10" style={{ borderTop: "1px solid var(--border-ice)" }} />
 
       {/* Manual form */}
-      <h2 className="text-lg font-semibold text-foreground mb-1">Or add a project manually</h2>
-      <p className="text-sm text-muted mb-5">Create a project directly from here.</p>
+      <h2 className="text-lg font-semibold mb-1" style={{ color: "var(--text-primary)" }}>Or add a project manually</h2>
+      <p className="text-sm mb-5" style={{ color: "var(--text-secondary)" }}>Create a project directly from here.</p>
 
       <form onSubmit={handleCreateProject} className="max-w-lg flex flex-col gap-4">
         <input
@@ -335,39 +340,44 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
-          className="rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder-muted outline-none focus:border-white/10 transition-colors"
+          className="rounded-xl px-4 py-3 text-sm outline-none transition-colors duration-150"
+          style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)", color: "var(--text-primary)" }}
         />
         <textarea
           placeholder="Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={3}
-          className="rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder-muted outline-none focus:border-white/10 transition-colors resize-none"
+          className="rounded-xl px-4 py-3 text-sm outline-none transition-colors duration-150 resize-none"
+          style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)", color: "var(--text-primary)" }}
         />
         <input
           type="text"
           placeholder="Tech stack (comma separated, e.g. React, TypeScript, Supabase)"
           value={techStack}
           onChange={(e) => setTechStack(e.target.value)}
-          className="rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder-muted outline-none focus:border-white/10 transition-colors"
+          className="rounded-xl px-4 py-3 text-sm outline-none transition-colors duration-150"
+          style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)", color: "var(--text-primary)" }}
         />
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value as "active" | "published" | "stealth")}
-          className="rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground outline-none focus:border-white/10 transition-colors"
+          className="rounded-xl px-4 py-3 text-sm outline-none transition-colors duration-150"
+          style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)", color: "var(--text-primary)" }}
         >
           <option value="active">Active</option>
           <option value="published">Published</option>
           <option value="stealth">Stealth</option>
         </select>
 
-        {formError && <p className="text-sm text-red-400">{formError}</p>}
-        {formSuccess && <p className="text-sm text-accent">{formSuccess}</p>}
+        {formError && <p className="text-sm" style={{ color: "#f87171" }}>{formError}</p>}
+        {formSuccess && <p className="text-sm" style={{ color: "var(--accent-green)" }}>{formSuccess}</p>}
 
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-full bg-white py-3 text-sm font-semibold text-black transition-opacity hover:opacity-80 disabled:opacity-50"
+          className="rounded-full py-3 text-sm font-semibold transition-opacity hover:opacity-80 disabled:opacity-50"
+          style={{ background: "var(--accent-green)", color: "#050a12" }}
         >
           {submitting ? "Creating..." : "Create Project"}
         </button>

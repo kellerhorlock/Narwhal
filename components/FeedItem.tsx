@@ -16,25 +16,26 @@ export default function FeedItem({ project, profile, onProjectClick, onUserClick
   const displayName = profile.display_name || profile.username;
 
   return (
-    <div className="mb-6">
+    <div>
       {/* Header row */}
       <div className="mb-3 flex items-center gap-2.5">
         <Avatar name={displayName} size={28} />
         <span>
           <button
             onClick={() => onUserClick(profile.username)}
-            className="font-semibold text-sm text-foreground hover:underline"
+            className="font-semibold text-sm hover:underline"
+            style={{ color: "var(--text-primary)" }}
           >
             {displayName}
           </button>
-          <span className="text-sm text-muted ml-1.5">{getActionVerb(project.name)}</span>
+          <span className="text-sm ml-1.5" style={{ color: "var(--text-secondary)" }}>{getActionVerb(project.name)}</span>
         </span>
-        <span className="ml-auto text-xs text-muted">{timeAgo(project.last_activity)}</span>
+        <span className="ml-auto text-xs" style={{ color: "var(--text-muted)" }}>{timeAgo(project.last_activity)}</span>
       </div>
 
-      {/* Project card */}
       <ProjectCard
         project={project}
+        height={220}
         onClick={() => onProjectClick(project)}
       />
     </div>

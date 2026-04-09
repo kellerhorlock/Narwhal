@@ -39,7 +39,6 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
       setAllUsers(users || []);
       setFollowingIds(new Set((follows || []).map((f) => f.following_id)));
 
-      // Build per-user stats for builder score
       const pub: Record<string, number> = {};
       const dl: Record<string, number> = {};
       const userTokensFromProjects: Record<string, number> = {};
@@ -55,12 +54,7 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
       const totalTokens = Object.values(userTokensFromProjects).reduce((s, t) => s + t, 0);
       const shipped = (projects || []).filter((p) => p.status === "published").length;
       const totalDownloads = (projects || []).reduce((s, p) => s + (p.downloads || 0), 0);
-      setCommunityStats({
-        tokens: totalTokens,
-        builders: (users || []).length,
-        shipped,
-        downloads: totalDownloads,
-      });
+      setCommunityStats({ tokens: totalTokens, builders: (users || []).length, shipped, downloads: totalDownloads });
       setLoading(false);
     }
     load();
@@ -96,30 +90,32 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
   const rest = ranked.slice(3);
 
   const podiumOrder = top3.length >= 3 ? [top3[1], top3[0], top3[2]] : top3;
-  const medals = ["🥈", "👑", "🥉"];
-  const podiumSizes = [56, 80, 56];
+  const medals = ["\uD83E\uDD48", "\uD83D\uDC51", "\uD83E\uDD49"];
+  const podiumSizes = [52, 72, 52];
   const barHeights = [80, 120, 60];
 
   if (loading) {
-    return <div className="py-20 flex justify-center"><NarwhalIcon size={40} className="text-muted" animate="pulse" /></div>;
+    return <div className="py-20 flex justify-center"><NarwhalIcon size={40} style={{ color: "var(--text-muted)" }} animate="pulse" /></div>;
   }
 
   return (
     <div>
-      <h1 className="font-serif italic text-foreground mb-3" style={{ fontSize: 42 }}>Leaderboard</h1>
-      <p className="mb-6" style={{ fontSize: 14, color: "#52525f" }}>
-        {mode === "score" ? "Builder score rankings" : "Today\u2019s token consumption rankings"}
+      <h1 className="font-serif italic mb-3" style={{ fontSize: 36, color: "var(--text-primary)" }}>Leaderboard</h1>
+      <p className="mb-6 text-[14px]" style={{ color: "var(--text-secondary)" }}>
+        {mode === "score" ? "Builder score rankings" : "Token consumption rankings"}
       </p>
 
       {/* Toggle */}
-      <div className="flex max-w-[380px] rounded-lg border border-border bg-card p-1 mb-8">
+      <div className="flex max-w-[380px] rounded-lg p-1 mb-8" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)" }}>
         {(["everyone", "following", "score"] as const).map((m) => (
           <button
             key={m}
             onClick={() => setMode(m)}
-            className={`flex-1 rounded-md px-4 py-1.5 text-xs font-semibold capitalize transition-colors duration-150 ${
-              mode === m ? "bg-white/[0.08] text-foreground" : "text-muted hover:text-foreground"
-            }`}
+            className="flex-1 rounded-md px-4 py-1.5 text-[12px] font-semibold capitalize transition-colors duration-150"
+            style={{
+              background: mode === m ? "var(--bg-hover)" : undefined,
+              color: mode === m ? "var(--text-primary)" : "var(--text-secondary)",
+            }}
           >
             {m === "score" ? "Builder Score" : m}
           </button>
@@ -149,7 +145,7 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
                   <button
                     key={user.id}
                     onClick={() => onUserClick(user.username)}
-                    className="flex flex-col items-center gap-2 hover:opacity-80 transition-opacity"
+                    className="flex flex-col items-center gap-2 transition-opacity duration-150 hover:opacity-80"
                   >
                     <span className="text-2xl">{medals[i]}</span>
                     <Avatar
@@ -157,19 +153,19 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
                       size={podiumSizes[i]}
                       showRing={actualRank === 0}
                     />
-                    <span className="text-sm font-semibold text-foreground flex items-center gap-1">
+                    <span className="text-sm font-semibold flex items-center gap-1" style={{ color: "var(--text-primary)" }}>
                       {displayName}
-                      {actualRank === 0 && <NarwhalIcon size={20} className="text-accent" />}
+                      {actualRank === 0 && <NarwhalIcon size={20} style={{ color: "var(--accent-green)" }} />}
                     </span>
-                    <span className="text-sm font-mono font-bold text-accent">
+                    <span className="text-sm font-mono font-bold" style={{ color: "var(--accent-green)" }}>
                       {formatNumber(getDisplayValue(user))}
                     </span>
-                    <span className="text-[10px] text-muted uppercase">{valueLabel}</span>
+                    <span className="text-[10px] uppercase" style={{ color: "var(--text-muted)" }}>{valueLabel}</span>
                     <div
                       className="w-20 rounded-t-lg"
                       style={{
                         height: barHeights[i],
-                        background: `linear-gradient(to top, rgba(56, 239, 125, 0.15), rgba(56, 239, 125, 0.03))`,
+                        background: "var(--bg-surface)",
                       }}
                     />
                   </button>
@@ -178,19 +174,21 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
             </div>
           )}
 
-          {/* Solo user message */}
           {ranked.length === 1 && (
-            <p className="text-center text-sm text-muted mb-6">Be the next to join!</p>
+            <p className="text-center text-sm mb-6" style={{ color: "var(--text-secondary)" }}>Be the next to join!</p>
           )}
 
           {/* Table */}
           {rest.length > 0 && (
-            <div className="rounded-xl border border-border overflow-hidden">
-              <div className="grid grid-cols-[48px_1fr_120px_120px_100px] px-4 py-2.5 text-[10px] font-semibold uppercase tracking-wider text-muted border-b border-border bg-card">
+            <div className="rounded-xl overflow-hidden" style={{ background: "var(--bg-surface)" }}>
+              <div
+                className="grid grid-cols-[48px_1fr_120px_120px_100px] px-4 py-2.5 text-[10px] font-medium uppercase tracking-wider"
+                style={{ color: "var(--text-muted)", borderBottom: "1px solid var(--border-ice)" }}
+              >
                 <span>#</span>
                 <span>Builder</span>
-                <span className="text-right">{mode === "score" ? "Score" : "Today"}</span>
-                <span className="text-right">3mo Total</span>
+                <span className="text-right">{mode === "score" ? "Score" : "Tokens"}</span>
+                <span className="text-right">Total</span>
                 <span className="text-right">Streak</span>
               </div>
               {rest.map((user, i) => {
@@ -200,24 +198,27 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
                   <button
                     key={user.id}
                     onClick={() => onUserClick(user.username)}
-                    className="grid grid-cols-[48px_1fr_120px_120px_100px] w-full items-center px-4 py-3 text-left border-b border-border last:border-b-0 hover:bg-card-hover transition-colors duration-150"
+                    className="grid grid-cols-[48px_1fr_120px_120px_100px] w-full items-center px-4 py-3 text-left transition-colors duration-150"
+                    style={{ borderBottom: "1px solid var(--border-ice)" }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = "var(--bg-hover)"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = ""; }}
                   >
-                    <span className="text-sm text-muted font-mono">{rank}</span>
+                    <span className="text-sm font-mono" style={{ color: "var(--text-muted)" }}>{rank}</span>
                     <div className="flex items-center gap-2.5 min-w-0">
                       <Avatar name={displayName} size={28} />
                       <div className="min-w-0">
-                        <div className="text-sm font-semibold text-foreground truncate">{displayName}</div>
-                        <div className="text-xs text-muted truncate">@{user.username}</div>
+                        <div className="text-sm font-semibold truncate" style={{ color: "var(--text-primary)" }}>{displayName}</div>
+                        <div className="text-xs font-mono truncate" style={{ color: "var(--text-secondary)" }}>@{user.username}</div>
                       </div>
                     </div>
-                    <span className="text-right text-sm font-mono font-bold text-accent">
+                    <span className="text-right text-sm font-mono font-bold" style={{ color: "var(--accent-green)" }}>
                       {formatNumber(getDisplayValue(user))}
                     </span>
-                    <span className="text-right text-sm font-mono text-foreground/60">
+                    <span className="text-right text-sm font-mono" style={{ color: "var(--text-secondary)" }}>
                       {formatNumber(userTokens[user.id] || 0)}
                     </span>
-                    <span className="text-right text-sm font-mono text-foreground/60">
-                      {user.streak_days}d {user.streak_days >= 14 ? "🔥" : ""}
+                    <span className="text-right text-sm font-mono" style={{ color: "var(--text-secondary)" }}>
+                      {user.streak_days}d {user.streak_days >= 14 ? "\uD83D\uDD25" : ""}
                     </span>
                   </button>
                 );
@@ -228,7 +229,7 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
       )}
 
       {/* Community summary */}
-      <div className="mt-8 grid grid-cols-4 rounded-xl border border-border bg-card">
+      <div className="mt-8 grid grid-cols-4 rounded-xl" style={{ background: "var(--bg-surface)" }}>
         {[
           { label: "Community Tokens", value: communityStats.tokens, green: true },
           { label: "Active Builders", value: communityStats.builders },
@@ -236,10 +237,10 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
           { label: "Total Downloads", value: communityStats.downloads },
         ].map((stat) => (
           <div key={stat.label} className="px-4 py-4 text-center">
-            <div className={`text-lg font-bold font-mono ${stat.green ? "text-accent" : "text-foreground"}`}>
+            <div className="text-lg font-bold font-mono" style={{ color: stat.green ? "var(--accent-green)" : "var(--text-primary)" }}>
               {formatNumber(stat.value)}
             </div>
-            <div className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-muted">
+            <div className="mt-0.5 text-[9px] font-medium uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
               {stat.label}
             </div>
           </div>

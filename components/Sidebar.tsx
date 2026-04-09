@@ -21,7 +21,7 @@ interface SidebarProps {
 const NAV_ITEMS = [
   { id: "feed", label: "For You", icon: Compass },
   { id: "search", label: "Search", icon: Search },
-  { id: "leaderboard", label: "Leaderboard", icon: Trophy, badge: "Live" },
+  { id: "leaderboard", label: "Leaderboard", icon: Trophy },
   { id: "profile", label: "Profile", icon: User },
 ];
 
@@ -50,16 +50,16 @@ export default function Sidebar({ activeTab, onTabChange, profile, publishedCoun
 
   return (
     <aside
-      className="fixed left-0 top-0 bottom-0 flex w-[240px] flex-col border-r px-4 py-6 z-50"
+      className="fixed left-0 top-0 bottom-0 flex w-[240px] flex-col px-4 py-6 z-50"
       style={{
-        borderColor: "var(--border-subtle)",
-        background: "linear-gradient(to bottom, rgba(8,14,24,0.98), rgba(6,10,18,1))",
+        background: "var(--bg-deep)",
+        borderRight: "1px solid rgba(56, 200, 255, 0.04)",
       }}
     >
       {/* Logo */}
       <button onClick={() => onTabChange("feed")} className="flex items-center gap-2.5 px-3 mb-8">
-        <NarwhalIcon size={32} className="text-white" />
-        <span className="text-lg font-bold text-foreground tracking-tight">Narwhal</span>
+        <NarwhalIcon size={26} style={{ color: "var(--text-primary)" }} />
+        <span className="text-[20px] font-bold" style={{ color: "var(--text-primary)" }}>Narwhal</span>
       </button>
 
       {/* Nav items */}
@@ -71,40 +71,38 @@ export default function Sidebar({ activeTab, onTabChange, profile, publishedCoun
             <button
               key={item.id}
               onClick={() => onTabChange(item.id)}
-              className="flex items-center gap-3 rounded-lg text-sm font-medium transition-all duration-150"
+              className="flex items-center gap-3 rounded-lg text-sm transition-colors duration-150"
               style={{
-                padding: "12px 16px",
-                background: active ? "var(--accent-blue-active)" : undefined,
-                color: active ? "#f0f0f5" : "#42424f",
-                borderLeft: `3px solid ${active ? "#38ef7d" : "transparent"}`,
+                padding: "10px 16px",
+                background: active ? "var(--bg-hover)" : undefined,
+                color: active ? "var(--text-primary)" : "var(--text-secondary)",
+                borderLeft: `2px solid ${active ? "var(--accent-green)" : "transparent"}`,
               }}
-              onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = "var(--bg-card-hover)"; e.currentTarget.style.color = "#f0f0f5"; }}
-              onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = ""; e.currentTarget.style.color = active ? "#f0f0f5" : "#42424f"; }}
+              onMouseEnter={(e) => { if (!active) { e.currentTarget.style.background = "var(--bg-surface)"; e.currentTarget.style.color = "var(--text-primary)"; } }}
+              onMouseLeave={(e) => { if (!active) { e.currentTarget.style.background = ""; e.currentTarget.style.color = "var(--text-secondary)"; } }}
             >
               <Icon size={18} />
               <span>{item.label}</span>
-              {item.badge && (
-                <span className="ml-auto rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-semibold text-accent">
-                  {item.badge}
-                </span>
-              )}
             </button>
           );
         })}
       </nav>
 
+      {/* Divider */}
+      <div className="mx-3 my-3" style={{ borderTop: "1px solid var(--border-ice)" }} />
+
       {/* Setup Agent link */}
       <button
         onClick={() => onTabChange("setup")}
-        className="mt-4 flex items-center gap-3 rounded-lg text-sm font-medium transition-all duration-150"
+        className="flex items-center gap-3 rounded-lg text-sm transition-colors duration-150"
         style={{
-          padding: "12px 16px",
-          background: activeTab === "setup" ? "var(--accent-blue-active)" : undefined,
-          color: activeTab === "setup" ? "#f0f0f5" : "#42424f",
-          borderLeft: `3px solid ${activeTab === "setup" ? "#38ef7d" : "transparent"}`,
+          padding: "10px 16px",
+          background: activeTab === "setup" ? "var(--bg-hover)" : undefined,
+          color: activeTab === "setup" ? "var(--text-primary)" : "var(--text-secondary)",
+          borderLeft: `2px solid ${activeTab === "setup" ? "var(--accent-green)" : "transparent"}`,
         }}
-        onMouseEnter={(e) => { if (activeTab !== "setup") e.currentTarget.style.background = "var(--bg-card-hover)"; e.currentTarget.style.color = "#f0f0f5"; }}
-        onMouseLeave={(e) => { if (activeTab !== "setup") e.currentTarget.style.background = ""; e.currentTarget.style.color = activeTab === "setup" ? "#f0f0f5" : "#42424f"; }}
+        onMouseEnter={(e) => { if (activeTab !== "setup") { e.currentTarget.style.background = "var(--bg-surface)"; e.currentTarget.style.color = "var(--text-primary)"; } }}
+        onMouseLeave={(e) => { if (activeTab !== "setup") { e.currentTarget.style.background = ""; e.currentTarget.style.color = "var(--text-secondary)"; } }}
       >
         <Sparkles size={18} />
         <span>Setup Agent</span>
@@ -118,40 +116,36 @@ export default function Sidebar({ activeTab, onTabChange, profile, publishedCoun
 
       {/* User card */}
       {profile && (
-        <div
-          className="rounded-xl p-4"
-          style={{ background: "var(--bg-card)", border: "1px solid var(--border-subtle)" }}
-        >
+        <div className="rounded-xl p-4" style={{ background: "var(--bg-surface)" }}>
           <div className="flex items-center gap-2.5 mb-2">
-            <Avatar name={profile.display_name || profile.username} size={34} />
+            <Avatar name={profile.display_name || profile.username} size={32} />
             <div className="min-w-0 flex-1">
-              <div className="text-sm font-semibold text-foreground truncate">
+              <div className="text-[13px] font-semibold truncate" style={{ color: "var(--text-primary)" }}>
                 {profile.display_name || profile.username}
               </div>
-              <div className="text-xs text-muted truncate">@{profile.username}</div>
+              <div className="text-[12px] font-mono truncate" style={{ color: "var(--text-secondary)" }}>@{profile.username}</div>
             </div>
           </div>
-          {/* Builder Score — only show if meaningful */}
           <BuilderScoreBadge score={score ? score.total : 0} size="sm" />
           {score && score.total > 0 && !isNaN(score.total) && <div className="mb-1" />}
           <div className="grid grid-cols-3 gap-2 text-center mt-2">
             <div>
-              <div className="text-[14px] font-bold font-mono text-accent">
+              <div className="text-[13px] font-bold font-mono" style={{ color: "var(--accent-green)" }}>
                 {statDisplay(estimatedTokens)}
               </div>
-              <div className="text-[9px] text-muted uppercase">3mo</div>
+              <div className="text-[9px] uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Tokens</div>
             </div>
             <div>
-              <div className="text-[14px] font-bold font-mono text-foreground">
+              <div className="text-[13px] font-bold font-mono" style={{ color: "var(--text-primary)" }}>
                 {statDisplay(profile.streak_days, "d")}
               </div>
-              <div className="text-[9px] text-muted uppercase">Streak</div>
+              <div className="text-[9px] uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Streak</div>
             </div>
             <div>
-              <div className="text-[14px] font-bold font-mono text-foreground">
+              <div className="text-[13px] font-bold font-mono" style={{ color: "var(--text-primary)" }}>
                 {statDisplay(profile.hours_this_month, "h")}
               </div>
-              <div className="text-[9px] text-muted uppercase">Hours</div>
+              <div className="text-[9px] uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Hours</div>
             </div>
           </div>
         </div>
@@ -159,8 +153,8 @@ export default function Sidebar({ activeTab, onTabChange, profile, publishedCoun
 
       {/* Brand watermark */}
       <div className="flex items-center gap-1.5 px-3 mt-4">
-        <NarwhalIcon size={16} className="text-muted/30" />
-        <span className="text-[10px] text-muted/30 font-medium">Narwhal</span>
+        <NarwhalIcon size={16} style={{ color: "var(--text-muted)" }} />
+        <span className="text-[10px] font-medium" style={{ color: "var(--text-muted)" }}>Narwhal</span>
       </div>
     </aside>
   );

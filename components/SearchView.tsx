@@ -6,8 +6,8 @@ import { formatNumber } from "@/lib/helpers";
 import Avatar from "./Avatar";
 import ProjectCard from "./ProjectCard";
 import EmptyState from "./EmptyState";
-import type { Profile, Project } from "@/lib/types";
 import NarwhalIcon from "./NarwhalIcon";
+import type { Profile, Project } from "@/lib/types";
 import { Search as SearchIcon } from "lucide-react";
 
 const POPULAR_TAGS = ["React", "Claude API", "Supabase", "Python", "Next.js", "Three.js", "Rust"];
@@ -42,7 +42,6 @@ export default function SearchView({ onProjectClick, onUserClick }: SearchViewPr
     load();
   }, []);
 
-  // Per-user stats
   const userStats = useMemo(() => {
     const stats: Record<string, { projectCount: number; totalCommits: number }> = {};
     for (const p of allProjects) {
@@ -53,7 +52,6 @@ export default function SearchView({ onProjectClick, onUserClick }: SearchViewPr
     return stats;
   }, [allProjects]);
 
-  // Tag counts
   const tagCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     for (const tag of POPULAR_TAGS) {
@@ -95,30 +93,33 @@ export default function SearchView({ onProjectClick, onUserClick }: SearchViewPr
 
   return (
     <div>
-      <h1 className="font-serif italic text-foreground mb-3" style={{ fontSize: 42 }}>Search</h1>
-      <p className="mb-6" style={{ fontSize: 14, color: "#52525f" }}>Find builders and projects</p>
+      <h1 className="font-serif italic mb-3" style={{ fontSize: 36, color: "var(--text-primary)" }}>Search</h1>
+      <p className="mb-6 text-[14px]" style={{ color: "var(--text-secondary)" }}>Find builders and projects</p>
 
       {/* Search input */}
       <div className="relative max-w-[480px] mb-5">
-        <SearchIcon size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+        <SearchIcon size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: "var(--text-muted)" }} />
         <input
           type="text"
           placeholder="Search..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="w-full rounded-xl border border-border bg-card pl-10 pr-4 py-2.5 text-sm text-foreground placeholder-muted outline-none focus:border-white/10 transition-colors"
+          className="w-full rounded-xl pl-10 pr-4 py-2.5 text-[15px] outline-none transition-colors duration-150"
+          style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)", color: "var(--text-primary)" }}
         />
       </div>
 
       {/* Toggle */}
-      <div className="flex max-w-[240px] rounded-lg border border-border bg-card p-1 mb-6">
+      <div className="flex max-w-[240px] rounded-lg p-1 mb-6" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)" }}>
         {(["users", "projects"] as const).map((m) => (
           <button
             key={m}
             onClick={() => { setMode(m); setActiveTag(null); }}
-            className={`flex-1 rounded-md px-4 py-1.5 text-xs font-semibold capitalize transition-colors duration-150 ${
-              mode === m ? "bg-white/[0.08] text-foreground" : "text-muted hover:text-foreground"
-            }`}
+            className="flex-1 rounded-md px-4 py-1.5 text-[12px] font-semibold capitalize transition-colors duration-150"
+            style={{
+              background: mode === m ? "var(--bg-hover)" : undefined,
+              color: mode === m ? "var(--text-primary)" : "var(--text-secondary)",
+            }}
           >
             {m}
           </button>
@@ -126,7 +127,7 @@ export default function SearchView({ onProjectClick, onUserClick }: SearchViewPr
       </div>
 
       {loading ? (
-        <div className="py-16 flex justify-center"><NarwhalIcon size={40} className="text-muted" animate="pulse" /></div>
+        <div className="py-16 flex justify-center"><NarwhalIcon size={40} style={{ color: "var(--text-muted)" }} animate="pulse" /></div>
       ) : mode === "users" ? (
         filteredUsers.length === 0 ? (
           <EmptyState
@@ -137,7 +138,6 @@ export default function SearchView({ onProjectClick, onUserClick }: SearchViewPr
           <div className="flex flex-col gap-1">
             {filteredUsers.map((user) => {
               const displayName = user.display_name || user.username;
-              const showRing = user.streak_days >= 14;
               const stats = userStats[user.id];
               const projectCount = stats?.projectCount || 0;
               const totalCommits = stats?.totalCommits || 0;
@@ -145,21 +145,23 @@ export default function SearchView({ onProjectClick, onUserClick }: SearchViewPr
                 <button
                   key={user.id}
                   onClick={() => onUserClick(user.username)}
-                  className="flex items-center gap-3.5 rounded-xl px-4 py-3 transition-colors duration-150 hover:bg-card-hover text-left"
+                  className="flex items-center gap-3.5 rounded-xl px-4 py-3 transition-colors duration-150 text-left"
+                  onMouseEnter={(e) => { e.currentTarget.style.background = "var(--bg-surface)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = ""; }}
                 >
-                  <Avatar name={displayName} size={44} showRing={showRing} />
+                  <Avatar name={displayName} size={44} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-foreground">{displayName}</span>
+                      <span className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>{displayName}</span>
                       {user.streak_days >= 7 && (
-                        <span className="text-xs text-orange-400">{user.streak_days}d</span>
+                        <span className="text-xs" style={{ color: "var(--accent-warm)" }}>{user.streak_days}d</span>
                       )}
                     </div>
-                    <div className="text-xs text-muted">
+                    <div className="text-xs font-mono" style={{ color: "var(--text-secondary)" }}>
                       @{user.username} · {projectCount} project{projectCount !== 1 ? "s" : ""} · {formatNumber(totalCommits)} commits
                     </div>
                   </div>
-                  <span className="text-sm font-mono font-semibold text-accent">
+                  <span className="text-sm font-mono font-semibold" style={{ color: "var(--accent-green)" }}>
                     {formatNumber(user.total_tokens_used)}
                   </span>
                 </button>
@@ -175,22 +177,21 @@ export default function SearchView({ onProjectClick, onUserClick }: SearchViewPr
               <button
                 key={tag}
                 onClick={() => handleTagClick(tag)}
-                className={`flex-shrink-0 rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors duration-150 ${
-                  activeTag === tag
-                    ? "bg-accent/15 text-accent border border-accent/30"
-                    : "border border-border text-muted hover:text-foreground hover:border-muted"
-                }`}
+                className="flex-shrink-0 rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors duration-150"
+                style={activeTag === tag
+                  ? { background: "rgba(52, 211, 153, 0.1)", color: "var(--accent-green)", border: "1px solid rgba(52, 211, 153, 0.2)" }
+                  : { border: "1px solid var(--border-ice)", color: "var(--text-secondary)" }
+                }
               >
                 {tag}{tagCounts[tag] > 0 ? ` (${tagCounts[tag]})` : ""}
               </button>
             ))}
           </div>
 
-          {/* Active tag header */}
           {activeTag && (
             <div className="mb-4">
-              <h2 className="text-sm font-semibold text-foreground">Projects built with {activeTag}</h2>
-              <p className="text-xs text-muted">{filteredProjects.length} project{filteredProjects.length !== 1 ? "s" : ""}</p>
+              <h2 className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>Projects built with {activeTag}</h2>
+              <p className="text-xs" style={{ color: "var(--text-secondary)" }}>{filteredProjects.length} project{filteredProjects.length !== 1 ? "s" : ""}</p>
             </div>
           )}
 

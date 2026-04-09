@@ -26,16 +26,16 @@ export default function DailyBriefing({ currentUser, feedProjects, allUsers, tre
 
   return (
     <div
-      className="rounded-xl border border-accent/15 p-5"
+      className="rounded-xl p-5"
       style={{
-        borderLeft: "3px solid rgba(56, 239, 125, 0.4)",
-        background: "linear-gradient(to right, rgba(56, 239, 125, 0.03), transparent)",
+        background: "var(--bg-surface)",
+        borderLeft: "2px solid rgba(52, 211, 153, 0.15)",
       }}
     >
-      <h2 style={{ fontSize: 18 }} className="font-semibold text-foreground mb-2">
+      <h2 className="text-[18px] font-semibold mb-2" style={{ color: "var(--text-primary)" }}>
         {greeting}, {displayName}
       </h2>
-      <div className="flex flex-col gap-1.5 text-sm text-foreground/60">
+      <div className="flex flex-col gap-1.5 text-sm" style={{ color: "var(--text-secondary)" }}>
         <p>Your network shipped {todayUpdates} update{todayUpdates !== 1 ? "s" : ""} today.</p>
         {currentUser.streak_days > 0 && (
           <p>
@@ -45,13 +45,13 @@ export default function DailyBriefing({ currentUser, feedProjects, allUsers, tre
         )}
         {topBuilder && topBuilder.tokens_today > 0 && (
           <p>
-            Community highlight: <span className="text-foreground font-medium">{topBuilder.display_name || topBuilder.username}</span> hit{" "}
-            <span className="font-mono text-accent">{formatNumber(topBuilder.tokens_today)}</span> tokens today.
+            Community highlight: <span className="font-medium" style={{ color: "var(--text-primary)" }}>{topBuilder.display_name || topBuilder.username}</span> hit{" "}
+            <span className="font-mono" style={{ color: "var(--accent-green)" }}>{formatNumber(topBuilder.tokens_today)}</span> tokens today.
           </p>
         )}
         {trendingNews && (
           <p>
-            Trending: <span className="text-foreground/80">{trendingNews.title}</span>
+            Trending: <span style={{ color: "var(--text-primary)" }}>{trendingNews.title}</span>
           </p>
         )}
       </div>

@@ -1,33 +1,35 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #060a12;
-  --color-foreground: #f0f0f5;
-  --color-muted: #42424f;
-  --color-accent: #38ef7d;
-  --color-card: rgba(100, 160, 255, 0.03);
-  --color-card-hover: rgba(100, 160, 255, 0.05);
-  --color-border: rgba(100, 160, 255, 0.06);
+  --color-background: #050a12;
+  --color-foreground: #e2e8f0;
+  --color-muted: #334155;
+  --color-accent: #34d399;
+  --color-card: #0a1020;
+  --color-card-hover: #0e1428;
+  --color-border: rgba(56, 200, 255, 0.06);
   --font-sans: var(--font-inter);
   --font-mono: var(--font-jetbrains);
-  --font-serif: var(--font-playfair);
+  --font-serif: var(--font-instrument);
 }
 
 :root {
-  --bg-primary: #060a12;
-  --bg-sidebar: rgba(8, 14, 24, 0.98);
-  --bg-card: rgba(100, 160, 255, 0.03);
-  --bg-card-hover: rgba(100, 160, 255, 0.05);
-  --border-subtle: rgba(100, 160, 255, 0.06);
-  --border-medium: rgba(100, 160, 255, 0.1);
-  --accent-green: #38ef7d;
-  --accent-blue: rgba(100, 160, 255, 0.08);
-  --accent-blue-active: rgba(100, 180, 255, 0.08);
+  --bg-deep: #050a12;
+  --bg-surface: #0a1020;
+  --bg-hover: #0e1428;
+  --border-ice: rgba(56, 200, 255, 0.06);
+  --border-ice-hover: rgba(56, 200, 255, 0.1);
+  --text-primary: #e2e8f0;
+  --text-secondary: #64748b;
+  --text-muted: #334155;
+  --accent-green: #34d399;
+  --accent-blue: #38bdf8;
+  --accent-warm: #f59e0b;
 }
 
 body {
-  background: var(--bg-primary);
-  color: #f0f0f5;
+  background: var(--bg-deep);
+  color: var(--text-primary);
 }
 
 /* Thin subtle scrollbar — arctic tint */
@@ -38,11 +40,11 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(100, 160, 255, 0.08);
+  background: rgba(56, 200, 255, 0.06);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 160, 255, 0.14);
+  background: rgba(56, 200, 255, 0.1);
 }
 
 /* Narwhal float animation for empty states */

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { createClient } from "@/lib/supabase";
-import { generateGradientSVG, hashString } from "@/lib/helpers";
+import { generateGradientSVG } from "@/lib/helpers";
 import type { Project } from "@/lib/types";
 import { X, Upload, RefreshCw } from "lucide-react";
 
@@ -33,8 +33,6 @@ export default function EditProjectModal({ project, onClose, onSaved }: EditProj
     return () => document.removeEventListener("keydown", handleEsc);
   }, [onClose]);
 
-  const imagePreview = thumbnailUrl || generateGradientSVG(gradientSeed, 600, 200);
-
   function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -47,7 +45,6 @@ export default function EditProjectModal({ project, onClose, onSaved }: EditProj
 
   function handleRegenerate() {
     setThumbnailUrl("");
-    // Randomize the seed to get a different gradient
     setGradientSeed(project.name + "-" + Math.random().toString(36).slice(2));
   }
 
@@ -96,6 +93,8 @@ export default function EditProjectModal({ project, onClose, onSaved }: EditProj
     { key: "downloads", label: "Downloads" },
   ];
 
+  const inputStyle = { background: "var(--bg-surface)", border: "1px solid var(--border-ice)", color: "var(--text-primary)" };
+
   return (
     <div
       className="fixed inset-0 z-[1000] flex items-center justify-center"
@@ -103,21 +102,18 @@ export default function EditProjectModal({ project, onClose, onSaved }: EditProj
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
-        className="relative w-full max-w-[520px] max-h-[90vh] overflow-y-auto rounded-2xl border p-6"
-        style={{
-          background: "var(--bg-primary)",
-          borderColor: "var(--border-subtle)",
-        }}
+        className="relative w-full max-w-[520px] max-h-[90vh] overflow-y-auto rounded-2xl p-6"
+        style={{ background: "var(--bg-deep)", border: "1px solid var(--border-ice)" }}
       >
-        {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-muted hover:text-foreground transition-colors"
+          className="absolute top-4 right-4 transition-colors duration-150"
+          style={{ color: "var(--text-secondary)" }}
         >
           <X size={20} />
         </button>
 
-        <h2 className="text-xl font-bold text-foreground mb-5">Edit Project</h2>
+        <h2 className="text-xl font-bold mb-5" style={{ color: "var(--text-primary)" }}>Edit Project</h2>
 
         {/* Image section */}
         <div className="mb-5">
@@ -132,16 +128,16 @@ export default function EditProjectModal({ project, onClose, onSaved }: EditProj
           <div className="flex gap-2">
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm text-foreground/70 hover:text-foreground transition-colors"
-              style={{ borderColor: "var(--border-subtle)" }}
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm transition-colors duration-150"
+              style={{ border: "1px solid var(--border-ice)", color: "var(--text-secondary)" }}
             >
               <Upload size={14} />
               Change Image
             </button>
             <button
               onClick={handleRegenerate}
-              className="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm text-foreground/70 hover:text-foreground transition-colors"
-              style={{ borderColor: "var(--border-subtle)" }}
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm transition-colors duration-150"
+              style={{ border: "1px solid var(--border-ice)", color: "var(--text-secondary)" }}
             >
               <RefreshCw size={14} />
               Regenerate
@@ -156,23 +152,21 @@ export default function EditProjectModal({ project, onClose, onSaved }: EditProj
           </div>
         </div>
 
-        {/* Name */}
         <label className="block mb-4">
-          <span className="text-xs font-semibold uppercase tracking-wider text-muted mb-1.5 block">Project Name</span>
+          <span className="text-[11px] font-medium uppercase tracking-widest mb-1.5 block" style={{ color: "var(--text-muted)" }}>Project Name</span>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-lg border bg-transparent px-3 py-2 text-sm text-foreground outline-none focus:border-accent/40 transition-colors"
-            style={{ borderColor: "var(--border-subtle)" }}
+            className="w-full rounded-lg px-3 py-2 text-sm outline-none transition-colors duration-150"
+            style={inputStyle}
           />
         </label>
 
-        {/* Description */}
         <label className="block mb-4">
           <div className="flex justify-between mb-1.5">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted">Description</span>
-            <span className={`text-xs ${description.length > 450 ? "text-orange-400" : "text-muted"}`}>
+            <span className="text-[11px] font-medium uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>Description</span>
+            <span className="text-xs" style={{ color: description.length > 450 ? "var(--accent-warm)" : "var(--text-muted)" }}>
               {description.length}/500
             </span>
           </div>
@@ -180,58 +174,54 @@ export default function EditProjectModal({ project, onClose, onSaved }: EditProj
             value={description}
             onChange={(e) => setDescription(e.target.value.slice(0, 500))}
             rows={3}
-            className="w-full rounded-lg border bg-transparent px-3 py-2 text-sm text-foreground outline-none focus:border-accent/40 transition-colors resize-none"
-            style={{ borderColor: "var(--border-subtle)" }}
+            className="w-full rounded-lg px-3 py-2 text-sm outline-none transition-colors duration-150 resize-none"
+            style={inputStyle}
           />
         </label>
 
-        {/* Landing URL */}
         <label className="block mb-4">
-          <span className="text-xs font-semibold uppercase tracking-wider text-muted mb-1.5 block">Landing Page URL</span>
+          <span className="text-[11px] font-medium uppercase tracking-widest mb-1.5 block" style={{ color: "var(--text-muted)" }}>Landing Page URL</span>
           <input
             type="url"
             value={landingUrl}
             onChange={(e) => setLandingUrl(e.target.value)}
             placeholder="https://your-project.com"
-            className="w-full rounded-lg border bg-transparent px-3 py-2 text-sm text-foreground outline-none focus:border-accent/40 transition-colors placeholder:text-muted/50"
-            style={{ borderColor: "var(--border-subtle)" }}
+            className="w-full rounded-lg px-3 py-2 text-sm outline-none transition-colors duration-150"
+            style={inputStyle}
           />
         </label>
 
-        {/* Download URL */}
         <label className="block mb-4">
-          <span className="text-xs font-semibold uppercase tracking-wider text-muted mb-1.5 block">Download URL</span>
+          <span className="text-[11px] font-medium uppercase tracking-widest mb-1.5 block" style={{ color: "var(--text-muted)" }}>Download URL</span>
           <input
             type="url"
             value={downloadUrl}
             onChange={(e) => setDownloadUrl(e.target.value)}
             placeholder="Link to download or repo"
-            className="w-full rounded-lg border bg-transparent px-3 py-2 text-sm text-foreground outline-none focus:border-accent/40 transition-colors placeholder:text-muted/50"
-            style={{ borderColor: "var(--border-subtle)" }}
+            className="w-full rounded-lg px-3 py-2 text-sm outline-none transition-colors duration-150"
+            style={inputStyle}
           />
         </label>
 
-        {/* Tech stack */}
         <label className="block mb-4">
-          <span className="text-xs font-semibold uppercase tracking-wider text-muted mb-1.5 block">Tech Stack</span>
+          <span className="text-[11px] font-medium uppercase tracking-widest mb-1.5 block" style={{ color: "var(--text-muted)" }}>Tech Stack</span>
           <input
             type="text"
             value={techStack}
             onChange={(e) => setTechStack(e.target.value)}
             placeholder="React, TypeScript, Supabase"
-            className="w-full rounded-lg border bg-transparent px-3 py-2 text-sm text-foreground outline-none focus:border-accent/40 transition-colors placeholder:text-muted/50"
-            style={{ borderColor: "var(--border-subtle)" }}
+            className="w-full rounded-lg px-3 py-2 text-sm outline-none transition-colors duration-150"
+            style={inputStyle}
           />
         </label>
 
-        {/* Status */}
         <label className="block mb-5">
-          <span className="text-xs font-semibold uppercase tracking-wider text-muted mb-1.5 block">Status</span>
+          <span className="text-[11px] font-medium uppercase tracking-widest mb-1.5 block" style={{ color: "var(--text-muted)" }}>Status</span>
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value as "active" | "published" | "stealth")}
-            className="w-full rounded-lg border bg-transparent px-3 py-2 text-sm text-foreground outline-none focus:border-accent/40 transition-colors"
-            style={{ borderColor: "var(--border-subtle)", background: "var(--bg-primary)" }}
+            className="w-full rounded-lg px-3 py-2 text-sm outline-none transition-colors duration-150"
+            style={{ ...inputStyle, background: "var(--bg-deep)" }}
           >
             <option value="active">Building</option>
             <option value="published">Published</option>
@@ -239,9 +229,8 @@ export default function EditProjectModal({ project, onClose, onSaved }: EditProj
           </select>
         </label>
 
-        {/* Stat visibility toggles */}
         <div className="mb-6">
-          <span className="text-xs font-semibold uppercase tracking-wider text-muted mb-3 block">Stat Visibility</span>
+          <span className="text-[11px] font-medium uppercase tracking-widest mb-3 block" style={{ color: "var(--text-muted)" }}>Stat Visibility</span>
           <div className="space-y-2">
             {allStats.map((stat) => {
               const isHidden = hiddenStats.includes(stat.key);
@@ -249,15 +238,15 @@ export default function EditProjectModal({ project, onClose, onSaved }: EditProj
                 <button
                   key={stat.key}
                   onClick={() => toggleStat(stat.key)}
-                  className="flex w-full items-center justify-between rounded-lg border px-3 py-2 text-sm transition-colors"
-                  style={{ borderColor: "var(--border-subtle)" }}
+                  className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors duration-150"
+                  style={{ border: "1px solid var(--border-ice)" }}
                 >
-                  <span className={isHidden ? "text-muted" : "text-foreground/80"}>
+                  <span style={{ color: isHidden ? "var(--text-muted)" : "var(--text-secondary)" }}>
                     {stat.label}
                   </span>
                   <div
                     className="relative w-9 h-5 rounded-full transition-colors duration-200"
-                    style={{ background: isHidden ? "var(--border-subtle)" : "var(--accent-green)" }}
+                    style={{ background: isHidden ? "var(--text-muted)" : "var(--accent-green)" }}
                   >
                     <div
                       className="absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform duration-200"
@@ -270,20 +259,19 @@ export default function EditProjectModal({ project, onClose, onSaved }: EditProj
           </div>
         </div>
 
-        {/* Actions */}
         <div className="flex gap-3">
           <button
             onClick={handleSave}
             disabled={saving || !name.trim()}
-            className="flex-1 rounded-lg py-2.5 text-sm font-semibold text-black transition-opacity disabled:opacity-40"
-            style={{ background: "var(--accent-green)" }}
+            className="flex-1 rounded-lg py-2.5 text-sm font-semibold transition-opacity disabled:opacity-40"
+            style={{ background: "var(--accent-green)", color: "#050a12" }}
           >
             {saving ? "Saving..." : "Save Changes"}
           </button>
           <button
             onClick={onClose}
-            className="rounded-lg border px-5 py-2.5 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors"
-            style={{ borderColor: "var(--border-subtle)" }}
+            className="rounded-lg px-5 py-2.5 text-sm font-medium transition-colors duration-150"
+            style={{ border: "1px solid var(--border-ice)", color: "var(--text-secondary)" }}
           >
             Cancel
           </button>

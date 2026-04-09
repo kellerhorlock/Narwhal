@@ -52,14 +52,14 @@ export default function UserProfilePage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
-        <NarwhalIcon size={40} className="text-muted" animate="pulse" />
+      <div className="flex min-h-screen items-center justify-center" style={{ background: "var(--bg-deep)" }}>
+        <NarwhalIcon size={40} style={{ color: "var(--text-muted)" }} animate="pulse" />
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
+    <div className="flex min-h-screen" style={{ background: "var(--bg-deep)", color: "var(--text-primary)" }}>
       <div className="hidden md:block">
         <Sidebar
           activeTab="profile"
@@ -70,7 +70,7 @@ export default function UserProfilePage() {
           profile={currentUser}
         />
       </div>
-      <main className="md:ml-[240px] flex-1 overflow-y-auto min-h-screen" style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.008) 0px, transparent 200px)" }}>
+      <main className="md:ml-[240px] flex-1 overflow-y-auto min-h-screen">
         <div className="mx-auto max-w-[860px] px-4 py-6 md:px-[52px] md:py-[44px]">
           {projectDetail ? (
             <ProjectDetail

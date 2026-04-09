@@ -26,37 +26,37 @@ export default function WeeklyDropCard({ projects, followerDelta }: WeeklyDropCa
   }
 
   return (
-    <div className="rounded-xl border border-accent/15 bg-gradient-to-r from-accent/[0.03] to-transparent p-5 mb-6">
+    <div
+      className="rounded-xl p-5"
+      style={{
+        background: "var(--bg-surface)",
+        borderLeft: "2px solid rgba(52, 211, 153, 0.15)",
+      }}
+    >
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-foreground">
+        <h3 className="text-[14px] font-medium" style={{ color: "var(--text-primary)" }}>
           Week of {getWeekLabel()}
         </h3>
         <button
           onClick={handleShare}
-          className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1 text-[11px] font-medium text-muted hover:text-foreground hover:border-muted transition-colors duration-150"
+          className="flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium transition-colors duration-150"
+          style={{ border: "1px solid var(--border-ice)", color: "var(--text-secondary)" }}
         >
-          {copied ? <Check size={11} className="text-accent" /> : <Share2 size={11} />}
+          {copied ? <Check size={11} style={{ color: "var(--accent-green)" }} /> : <Share2 size={11} />}
           {copied ? "Copied!" : "Share"}
         </button>
       </div>
 
-      {/* Human vs Machine mini split */}
       <div className="flex flex-col gap-1.5 mb-3">
-        <div className="flex items-center gap-2 text-xs">
-          <span className="text-[10px]">👤</span>
-          <span className="text-foreground/70">
-            You: <span className="font-mono font-semibold text-foreground">{humanHours}</span> building · <span className="font-mono font-semibold text-foreground">{projects.length}</span> project{projects.length !== 1 ? "s" : ""}
-          </span>
+        <div className="text-xs" style={{ color: "var(--text-secondary)" }}>
+          You: <span className="font-mono font-semibold" style={{ color: "var(--text-primary)" }}>{humanHours}</span> building · <span className="font-mono font-semibold" style={{ color: "var(--text-primary)" }}>{projects.length}</span> project{projects.length !== 1 ? "s" : ""}
         </div>
-        <div className="flex items-center gap-2 text-xs">
-          <span className="text-[10px]">🤖</span>
-          <span className="text-foreground/70">
-            AI: <span className="font-mono font-semibold text-accent">{totalCommits > 0 ? formatTokens(totalCommits) : "0"}</span> tokens · <span className="font-mono font-semibold text-foreground">{formatNumber(totalCommits)}</span> commits
-          </span>
+        <div className="text-xs" style={{ color: "var(--text-secondary)" }}>
+          AI: <span className="font-mono font-semibold" style={{ color: "var(--accent-green)" }}>{totalCommits > 0 ? formatTokens(totalCommits) : "0"}</span> tokens · <span className="font-mono font-semibold" style={{ color: "var(--text-primary)" }}>{formatNumber(totalCommits)}</span> commits
         </div>
       </div>
 
-      <p className="text-xs text-foreground/50 italic">{summary}</p>
+      <p className="text-[13px] italic" style={{ color: "var(--text-secondary)" }}>{summary}</p>
     </div>
   );
 }

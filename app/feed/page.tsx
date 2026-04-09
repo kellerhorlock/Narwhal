@@ -13,11 +13,11 @@ import ProfileView from "@/components/ProfileView";
 import SearchView from "@/components/SearchView";
 import LeaderboardView from "@/components/LeaderboardView";
 import SetupView from "@/components/SetupView";
+import NarwhalIcon from "@/components/NarwhalIcon";
 import { newsFeed as fallbackNews } from "@/lib/ai-news-feed";
 import type { NewsEntry } from "@/lib/ai-news-feed";
 import type { Profile, Project } from "@/lib/types";
 import { Star } from "lucide-react";
-import NarwhalIcon from "@/components/NarwhalIcon";
 import Avatar from "@/components/Avatar";
 import ProjectCard from "@/components/ProjectCard";
 import { timeAgo } from "@/lib/helpers";
@@ -54,7 +54,6 @@ export default function FeedPage() {
   const [newsEntries, setNewsEntries] = useState<NewsEntry[]>(fallbackNews);
   const [feedLoading, setFeedLoading] = useState(true);
 
-  // Fetch live news
   useEffect(() => {
     async function loadNews() {
       try {
@@ -65,14 +64,11 @@ export default function FeedPage() {
             setNewsEntries(data as NewsEntry[]);
           }
         }
-      } catch {
-        // Fallback already set
-      }
+      } catch { /* Fallback already set */ }
     }
     loadNews();
   }, []);
 
-  // Auth check
   useEffect(() => {
     async function checkAuth() {
       const supabase = createClient();
@@ -101,7 +97,6 @@ export default function FeedPage() {
     checkAuth();
   }, [router]);
 
-  // Load feed data
   useEffect(() => {
     if (!currentUserId) return;
     async function loadFeed() {
@@ -117,7 +112,6 @@ export default function FeedPage() {
           .limit(50),
         supabase.from("profiles").select("*").order("tokens_today", { ascending: false }),
         supabase.from("projects").select("status, downloads, user_id, commits"),
-        // Featured projects: most downloads/commits for new user discovery
         supabase
           .from("projects")
           .select("*, profiles(*)")
@@ -141,39 +135,31 @@ export default function FeedPage() {
     loadFeed();
   }, [currentUserId]);
 
-  // Build merged feed
   const mergedFeed = useMemo((): FeedEntry[] => {
     if (feedFilter === "following") {
-      // Following tab: projects only, no news
       return feedProjects.map((p) => ({ kind: "project" as const, project: p }));
     }
 
-    // "All" tab: interleave news with projects
     const hasProjects = feedProjects.length > 0;
     const entries: FeedEntry[] = [];
 
     if (hasProjects) {
-      // Interleave: every 2-3 projects, insert 1 news card
       let newsIndex = 0;
       for (let i = 0; i < feedProjects.length; i++) {
         entries.push({ kind: "project", project: feedProjects[i] });
-        // After every 2nd project (index 1, 3, 5...), insert news
         if ((i + 1) % 2 === 0 && newsIndex < newsEntries.length) {
           entries.push({ kind: "news", entry: newsEntries[newsIndex] });
           newsIndex++;
         }
       }
-      // Append remaining news at the end
       while (newsIndex < newsEntries.length) {
         entries.push({ kind: "news", entry: newsEntries[newsIndex] });
         newsIndex++;
       }
     } else {
-      // New user / no projects: mostly news, with featured projects mixed in
       let featIndex = 0;
       for (let i = 0; i < newsEntries.length; i++) {
         entries.push({ kind: "news", entry: newsEntries[i] });
-        // After every 3rd news item, insert a featured project
         if ((i + 1) % 3 === 0 && featIndex < featuredProjects.length) {
           entries.push({ kind: "featured", project: featuredProjects[featIndex] });
           featIndex++;
@@ -214,8 +200,8 @@ export default function FeedPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
-        <NarwhalIcon size={40} className="text-muted" animate="pulse" />
+      <div className="flex min-h-screen items-center justify-center" style={{ background: "var(--bg-deep)" }}>
+        <NarwhalIcon size={40} style={{ color: "var(--text-muted)" }} animate="pulse" />
       </div>
     );
   }
@@ -223,8 +209,8 @@ export default function FeedPage() {
   const showingDetail = !!view.projectDetail;
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
-      {/* Desktop sidebar - hidden on mobile */}
+    <div className="flex min-h-screen" style={{ background: "var(--bg-deep)", color: "var(--text-primary)" }}>
+      {/* Desktop sidebar */}
       <div className="hidden md:block">
         <Sidebar
           activeTab={view.tab}
@@ -237,10 +223,7 @@ export default function FeedPage() {
         />
       </div>
 
-      <main
-        className="md:ml-[240px] flex-1 overflow-y-auto min-h-screen pb-20 md:pb-0"
-        style={{ background: "radial-gradient(ellipse at top center, rgba(56,130,220,0.04) 0%, transparent 60%)" }}
-      >
+      <main className="md:ml-[240px] flex-1 overflow-y-auto min-h-screen pb-20 md:pb-0">
         <div className="mx-auto max-w-[860px] px-4 py-6 md:px-[52px] md:py-[44px]">
           {showingDetail ? (
             <ProjectDetail
@@ -254,28 +237,28 @@ export default function FeedPage() {
             />
           ) : view.tab === "feed" ? (
             <div>
-              <h1 className="font-serif italic text-foreground mb-3" style={{ fontSize: 42 }}>For You</h1>
-              <p className="mb-6" style={{ fontSize: 14, color: "#52525f" }}>What builders are shipping right now</p>
+              <h1 className="font-serif italic mb-3" style={{ fontSize: 36, color: "var(--text-primary)" }}>For You</h1>
+              <p className="mb-6 text-[14px]" style={{ color: "var(--text-secondary)" }}>What builders are shipping right now</p>
 
               {/* Feed filter tabs */}
-              <div className="flex gap-1 mb-8 rounded-lg p-1" style={{ background: "var(--bg-card)", border: "1px solid var(--border-subtle)", width: "fit-content" }}>
+              <div className="flex gap-1 mb-8 rounded-lg p-1" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)", width: "fit-content" }}>
                 <button
                   onClick={() => setFeedFilter("all")}
-                  className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors duration-150 ${
-                    feedFilter === "all"
-                      ? "bg-white/10 text-foreground"
-                      : "text-muted hover:text-foreground/70"
-                  }`}
+                  className="rounded-md px-4 py-1.5 text-[12px] font-medium transition-colors duration-150"
+                  style={{
+                    background: feedFilter === "all" ? "var(--bg-hover)" : undefined,
+                    color: feedFilter === "all" ? "var(--text-primary)" : "var(--text-secondary)",
+                  }}
                 >
                   All
                 </button>
                 <button
                   onClick={() => setFeedFilter("following")}
-                  className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors duration-150 ${
-                    feedFilter === "following"
-                      ? "bg-white/10 text-foreground"
-                      : "text-muted hover:text-foreground/70"
-                  }`}
+                  className="rounded-md px-4 py-1.5 text-[12px] font-medium transition-colors duration-150"
+                  style={{
+                    background: feedFilter === "following" ? "var(--bg-hover)" : undefined,
+                    color: feedFilter === "following" ? "var(--text-primary)" : "var(--text-secondary)",
+                  }}
                 >
                   Following
                 </button>
@@ -294,7 +277,7 @@ export default function FeedPage() {
               <div className="h-6" />
 
               {feedLoading ? (
-                <div className="py-16 flex justify-center"><NarwhalIcon size={40} className="text-muted" animate="pulse" /></div>
+                <div className="py-16 flex justify-center"><NarwhalIcon size={40} style={{ color: "var(--text-muted)" }} animate="pulse" /></div>
               ) : mergedFeed.length === 0 ? (
                 <EmptyState
                   title="Your feed is empty"
@@ -305,7 +288,7 @@ export default function FeedPage() {
                   ]}
                 />
               ) : (
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-6">
                   {mergedFeed.map((item, idx) => {
                     if (item.kind === "news") {
                       return <NewsCard key={item.entry.id} entry={item.entry} />;
@@ -316,17 +299,17 @@ export default function FeedPage() {
                       return (
                         <div key={`feat-${item.project.id}`}>
                           <div className="mb-3 flex items-center gap-2.5">
-                            <Star size={14} className="text-accent" />
-                            <span className="text-xs font-semibold text-accent uppercase tracking-wider">Featured Builder</span>
-                            <span className="text-xs text-muted ml-1">·</span>
+                            <Star size={14} style={{ color: "var(--accent-green)" }} />
+                            <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--accent-green)" }}>Featured Builder</span>
+                            <span className="text-xs" style={{ color: "var(--text-muted)" }}>·</span>
                             <button
                               onClick={() => handleUserClick(profile.username)}
                               className="flex items-center gap-1.5"
                             >
                               <Avatar name={displayName} size={20} />
-                              <span className="text-sm font-medium text-foreground hover:underline">{displayName}</span>
+                              <span className="text-sm font-medium hover:underline" style={{ color: "var(--text-primary)" }}>{displayName}</span>
                             </button>
-                            <span className="ml-auto text-xs text-muted">{timeAgo(item.project.last_activity)}</span>
+                            <span className="ml-auto text-xs" style={{ color: "var(--text-muted)" }}>{timeAgo(item.project.last_activity)}</span>
                           </div>
                           <ProjectCard
                             project={item.project}
@@ -335,7 +318,6 @@ export default function FeedPage() {
                         </div>
                       );
                     }
-                    // Regular project
                     return (
                       <FeedItem
                         key={item.project.id}
@@ -399,8 +381,8 @@ function MobileTabBar({ activeTab, onTabChange }: { activeTab: string; onTabChan
     <nav
       className="fixed bottom-0 left-0 right-0 z-50 flex md:hidden border-t"
       style={{
-        background: "rgba(6,10,18,0.98)",
-        borderColor: "var(--border-subtle)",
+        background: "rgba(5,10,18,0.98)",
+        borderColor: "var(--border-ice)",
         paddingBottom: "env(safe-area-inset-bottom)",
       }}
     >
@@ -411,7 +393,7 @@ function MobileTabBar({ activeTab, onTabChange }: { activeTab: string; onTabChan
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
             className="flex-1 flex flex-col items-center gap-1 py-2.5 transition-colors"
-            style={{ color: active ? "#38ef7d" : "#42424f" }}
+            style={{ color: active ? "var(--accent-green)" : "var(--text-muted)" }}
           >
             {tab.icon}
             <span className="text-[10px] font-semibold">{tab.label}</span>
