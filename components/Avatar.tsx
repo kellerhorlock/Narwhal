@@ -1,6 +1,7 @@
 "use client";
 
 import { getAvatarGradient } from "@/lib/helpers";
+import NarwhalIcon from "./NarwhalIcon";
 
 interface AvatarProps {
   name: string;
@@ -18,7 +19,7 @@ export default function Avatar({ name, size = 40, showRing = false }: AvatarProp
 
   return (
     <div
-      className="flex-shrink-0 flex items-center justify-center rounded-full font-semibold text-white select-none"
+      className="flex-shrink-0 flex items-center justify-center rounded-full font-semibold text-white select-none relative overflow-hidden"
       style={{
         width: size,
         height: size,
@@ -27,7 +28,8 @@ export default function Avatar({ name, size = 40, showRing = false }: AvatarProp
         boxShadow: showRing ? "0 0 0 2.5px #060a12, 0 0 0 4.5px #38ef7d" : undefined,
       }}
     >
-      {initials}
+      <NarwhalIcon size={size * 0.7} className="absolute text-white/[0.08]" />
+      <span className="relative z-10">{initials}</span>
     </div>
   );
 }

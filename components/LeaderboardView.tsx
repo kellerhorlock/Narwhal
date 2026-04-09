@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase";
 import { formatNumber, calculateBuilderScore } from "@/lib/helpers";
 import Avatar from "./Avatar";
 import EmptyState from "./EmptyState";
+import NarwhalIcon from "./NarwhalIcon";
 import type { Profile } from "@/lib/types";
 
 interface LeaderboardViewProps {
@@ -100,7 +101,7 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
   const barHeights = [80, 120, 60];
 
   if (loading) {
-    return <div className="text-muted py-20 text-center">Loading...</div>;
+    return <div className="py-20 flex justify-center"><NarwhalIcon size={40} className="text-muted" animate="pulse" /></div>;
   }
 
   return (
@@ -156,7 +157,10 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
                       size={podiumSizes[i]}
                       showRing={actualRank === 0}
                     />
-                    <span className="text-sm font-semibold text-foreground">{displayName}</span>
+                    <span className="text-sm font-semibold text-foreground flex items-center gap-1">
+                      {displayName}
+                      {actualRank === 0 && <NarwhalIcon size={20} className="text-accent" />}
+                    </span>
                     <span className="text-sm font-mono font-bold text-accent">
                       {formatNumber(getDisplayValue(user))}
                     </span>

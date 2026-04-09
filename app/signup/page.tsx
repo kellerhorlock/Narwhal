@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase";
+import NarwhalIcon from "@/components/NarwhalIcon";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -40,6 +41,7 @@ export default function SignupPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center text-white" style={{ background: "#060a12" }}>
+      <NarwhalIcon size={60} className="mb-5 text-white" animate="fade-in" />
       <h1 className="mb-8 text-3xl font-bold tracking-tight">Join Narwhal</h1>
       <form onSubmit={handleSignup} className="flex w-full max-w-sm flex-col gap-4">
         <input

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase";
 import Sidebar from "@/components/Sidebar";
 import ProfileView from "@/components/ProfileView";
 import ProjectDetail from "@/components/ProjectDetail";
+import NarwhalIcon from "@/components/NarwhalIcon";
 import type { Profile, Project } from "@/lib/types";
 
 export default function UserProfilePage() {
@@ -52,7 +53,7 @@ export default function UserProfilePage() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
-        <p className="text-muted">Loading...</p>
+        <NarwhalIcon size={40} className="text-muted" animate="pulse" />
       </div>
     );
   }

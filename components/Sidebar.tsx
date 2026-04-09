@@ -1,6 +1,7 @@
 "use client";
 
 import { Compass, Search, Trophy, User, Sparkles } from "lucide-react";
+import NarwhalIcon from "./NarwhalIcon";
 import Avatar from "./Avatar";
 import BuilderScoreBadge from "./BuilderScoreBadge";
 import ActivityPulse from "./ActivityPulse";
@@ -57,17 +58,7 @@ export default function Sidebar({ activeTab, onTabChange, profile, publishedCoun
     >
       {/* Logo */}
       <button onClick={() => onTabChange("feed")} className="flex items-center gap-2.5 px-3 mb-8">
-        <svg width="32" height="32" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <line x1="40" y1="4" x2="40" y2="24" stroke="white" strokeWidth="2" strokeLinecap="round" />
-          <line x1="37" y1="10" x2="43" y2="14" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="37" y1="17" x2="43" y2="21" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-          <ellipse cx="40" cy="44" rx="22" ry="16" stroke="white" strokeWidth="2" fill="none" />
-          <path d="M18 44 C10 44, 6 36, 12 32" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" />
-          <path d="M12 32 C8 28, 4 32, 8 36" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" />
-          <path d="M34 56 C32 64, 38 66, 40 60" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" />
-          <circle cx="50" cy="40" r="2" fill="white" />
-          <path d="M56 46 C58 48, 60 47, 61 45" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" />
-        </svg>
+        <NarwhalIcon size={32} className="text-white" />
         <span className="text-lg font-bold text-foreground tracking-tight">Narwhal</span>
       </button>
 
@@ -165,6 +156,12 @@ export default function Sidebar({ activeTab, onTabChange, profile, publishedCoun
           </div>
         </div>
       )}
+
+      {/* Brand watermark */}
+      <div className="flex items-center gap-1.5 px-3 mt-4">
+        <NarwhalIcon size={16} className="text-muted/30" />
+        <span className="text-[10px] text-muted/30 font-medium">Narwhal</span>
+      </div>
     </aside>
   );
 }

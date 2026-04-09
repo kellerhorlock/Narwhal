@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase";
 import { Copy, Check, ChevronDown, ChevronUp, RefreshCw, Key } from "lucide-react";
+import NarwhalIcon from "./NarwhalIcon";
 
 interface SetupViewProps {
   userId: string;
@@ -181,6 +182,9 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
 
   return (
     <div>
+      <div className="mb-6" style={{ filter: "drop-shadow(0 0 20px rgba(56, 239, 125, 0.15))" }}>
+        <NarwhalIcon size={80} className="text-white" animate="fade-in" />
+      </div>
       <h1 className="font-serif italic text-3xl text-foreground mb-2">
         You&apos;re in. Let&apos;s load your work.
       </h1>

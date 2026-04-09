@@ -17,6 +17,7 @@ import { newsFeed as fallbackNews } from "@/lib/ai-news-feed";
 import type { NewsEntry } from "@/lib/ai-news-feed";
 import type { Profile, Project } from "@/lib/types";
 import { Star } from "lucide-react";
+import NarwhalIcon from "@/components/NarwhalIcon";
 import Avatar from "@/components/Avatar";
 import ProjectCard from "@/components/ProjectCard";
 import { timeAgo } from "@/lib/helpers";
@@ -214,7 +215,7 @@ export default function FeedPage() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
-        <p className="text-muted">Loading...</p>
+        <NarwhalIcon size={40} className="text-muted" animate="pulse" />
       </div>
     );
   }
@@ -293,7 +294,7 @@ export default function FeedPage() {
               <div className="h-6" />
 
               {feedLoading ? (
-                <div className="text-muted py-16 text-center">Loading feed...</div>
+                <div className="py-16 flex justify-center"><NarwhalIcon size={40} className="text-muted" animate="pulse" /></div>
               ) : mergedFeed.length === 0 ? (
                 <EmptyState
                   title="Your feed is empty"

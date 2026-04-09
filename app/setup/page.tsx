@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import Sidebar from "@/components/Sidebar";
 import SetupView from "@/components/SetupView";
+import NarwhalIcon from "@/components/NarwhalIcon";
 import type { Profile } from "@/lib/types";
 
 export default function SetupPage() {
@@ -36,7 +37,7 @@ export default function SetupPage() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
-        <p className="text-muted">Loading...</p>
+        <NarwhalIcon size={40} className="text-muted" animate="pulse" />
       </div>
     );
   }

@@ -12,6 +12,7 @@ import ContextMenu from "./ContextMenu";
 import EditProjectModal from "./EditProjectModal";
 import EmptyState from "./EmptyState";
 import type { Profile, Project } from "@/lib/types";
+import NarwhalIcon from "./NarwhalIcon";
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -162,7 +163,7 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
   }
 
   if (loading) {
-    return <div className="text-muted py-20 text-center">Loading...</div>;
+    return <div className="py-20 flex justify-center"><NarwhalIcon size={40} className="text-muted" animate="pulse" /></div>;
   }
 
   if (!profile) {

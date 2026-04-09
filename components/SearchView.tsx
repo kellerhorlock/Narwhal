@@ -7,6 +7,7 @@ import Avatar from "./Avatar";
 import ProjectCard from "./ProjectCard";
 import EmptyState from "./EmptyState";
 import type { Profile, Project } from "@/lib/types";
+import NarwhalIcon from "./NarwhalIcon";
 import { Search as SearchIcon } from "lucide-react";
 
 const POPULAR_TAGS = ["React", "Claude API", "Supabase", "Python", "Next.js", "Three.js", "Rust"];
@@ -125,7 +126,7 @@ export default function SearchView({ onProjectClick, onUserClick }: SearchViewPr
       </div>
 
       {loading ? (
-        <div className="text-muted py-16 text-center">Loading...</div>
+        <div className="py-16 flex justify-center"><NarwhalIcon size={40} className="text-muted" animate="pulse" /></div>
       ) : mode === "users" ? (
         filteredUsers.length === 0 ? (
           <EmptyState

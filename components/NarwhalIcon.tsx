@@ -1,6 +1,20 @@
 "use client";
 
-export default function NarwhalIcon({ size = 48, className = "" }: { size?: number; className?: string }) {
+interface NarwhalIconProps {
+  size?: number;
+  className?: string;
+  animate?: "float" | "pulse" | "fade-in";
+}
+
+export default function NarwhalIcon({ size = 48, className = "", animate }: NarwhalIconProps) {
+  const animClass = animate === "float"
+    ? "animate-narwhal-float"
+    : animate === "pulse"
+    ? "animate-narwhal-pulse"
+    : animate === "fade-in"
+    ? "animate-narwhal-fade-in"
+    : "";
+
   return (
     <svg
       width={size}
@@ -8,7 +22,7 @@ export default function NarwhalIcon({ size = 48, className = "" }: { size?: numb
       viewBox="0 0 80 80"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={className}
+      className={`${animClass} ${className}`.trim()}
     >
       <line x1="40" y1="4" x2="40" y2="24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
       <line x1="37" y1="10" x2="43" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
