@@ -61,15 +61,15 @@ export function generateGradientSVG(name: string, width = 400, height = 240): st
 
 export function deriveStats(commits: number) {
   return {
-    tokens: commits * 750000,
-    linesOfCode: commits * 65,
-    hoursBuilding: Math.round(commits * 2.5 * 10) / 10,
-    workDays: Math.round((commits * 2.5) / 8 * 10) / 10,
+    tokens: commits * 14777,
+    linesOfCode: commits * 67,
+    hoursBuilding: Math.round(commits * 0.47 * 10) / 10,
+    workDays: Math.round((commits * 0.47) / 8 * 10) / 10,
   };
 }
 
 export function formatTokens(commits: number): string {
-  const tokens = commits * 750000;
+  const tokens = commits * 14777;
   if (tokens >= 1_000_000) return (tokens / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
   if (tokens >= 1_000) return (tokens / 1_000).toFixed(0) + 'K';
   return tokens.toString();
@@ -215,7 +215,7 @@ export function generateProjectInsights(
 
   const techStr = techStack.length > 0 ? ` with ${techStack.join(", ")}` : "";
   let main = `Built over ${formatNumber(commits)} commits${techStr}.`;
-  if (stats.tokens > 0) main += ` ~${formatTokens(commits)} tokens consumed, averaging ~750K per commit.`;
+  if (stats.tokens > 0) main += ` ~${formatTokens(commits)} tokens consumed, averaging ~14.8K per commit.`;
   if (stats.hoursBuilding > 0) main += ` ~${stats.hoursBuilding}h of estimated development time.`;
   if (downloads > 0) main += ` ${formatNumber(downloads)} developers have downloaded this project.`;
   lines.push(main);

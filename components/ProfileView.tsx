@@ -79,7 +79,7 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
           const pub = userProjs.filter((p) => p.status === "published").length;
           const dl = userProjs.reduce((s, p) => s + safeNum(p.downloads), 0);
           const totalCommits = userProjs.reduce((s, p) => s + safeNum(p.commits), 0);
-          return calculateBuilderScore(totalCommits * 750000, pub, dl, safeNum(u.streak_days), safeNum(u.hours_this_month)).total;
+          return calculateBuilderScore(totalCommits * 14777, pub, dl, safeNum(u.streak_days), safeNum(u.hours_this_month)).total;
         });
         setAllScores(scores);
       }
@@ -173,9 +173,9 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
   const launchedCount = projects.filter((p) => p.status === "published").length;
   const totalDownloads = projects.reduce((sum, p) => sum + safeNum(p.downloads), 0);
   const totalCommits = projects.reduce((sum, p) => sum + safeNum(p.commits), 0);
-  const totalTokens = totalCommits * 750000;
+  const totalTokens = totalCommits * 14777;
   const monthsSinceJoined = Math.max(1, Math.ceil((Date.now() - new Date(profile.created_at).getTime()) / (1000 * 60 * 60 * 24 * 30)));
-  const hoursPerMonth = Math.round((totalCommits * 2.5) / monthsSinceJoined);
+  const hoursPerMonth = Math.round((totalCommits * 0.47) / monthsSinceJoined);
   const score = calculateBuilderScore(totalTokens, launchedCount, totalDownloads, streakDays, hoursPerMonth);
   const percentile = getPercentile(score.total, allScores);
 
