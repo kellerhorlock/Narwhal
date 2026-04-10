@@ -11,6 +11,7 @@ import ProjectCard from "./ProjectCard";
 import ContextMenu from "./ContextMenu";
 import EditProjectModal from "./EditProjectModal";
 import EmptyState from "./EmptyState";
+import FollowListModal from "./FollowListModal";
 import NarwhalIcon from "./NarwhalIcon";
 import type { Profile, Project } from "@/lib/types";
 import { LogOut } from "lucide-react";
@@ -40,6 +41,7 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
   const [loading, setLoading] = useState(true);
   const isOwnProfile = !username;
 
+  const [followListMode, setFollowListMode] = useState<"followers" | "following" | null>(null);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; project: Project } | null>(null);
   const [editProject, setEditProject] = useState<Project | null>(null);
   const [deleteProject, setDeleteProject] = useState<Project | null>(null);
@@ -77,7 +79,7 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
           const pub = userProjs.filter((p) => p.status === "published").length;
           const dl = userProjs.reduce((s, p) => s + safeNum(p.downloads), 0);
           const totalCommits = userProjs.reduce((s, p) => s + safeNum(p.commits), 0);
-          return calculateBuilderScore(totalCommits * 25000, pub, dl, safeNum(u.streak_days), safeNum(u.hours_this_month)).total;
+          return calculateBuilderScore(totalCommits * 750000, pub, dl, safeNum(u.streak_days), safeNum(u.hours_this_month)).total;
         });
         setAllScores(scores);
       }
@@ -171,9 +173,9 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
   const launchedCount = projects.filter((p) => p.status === "published").length;
   const totalDownloads = projects.reduce((sum, p) => sum + safeNum(p.downloads), 0);
   const totalCommits = projects.reduce((sum, p) => sum + safeNum(p.commits), 0);
-  const totalTokens = totalCommits * 25000;
+  const totalTokens = totalCommits * 750000;
   const monthsSinceJoined = Math.max(1, Math.ceil((Date.now() - new Date(profile.created_at).getTime()) / (1000 * 60 * 60 * 24 * 30)));
-  const hoursPerMonth = Math.round((totalCommits * 0.65) / monthsSinceJoined);
+  const hoursPerMonth = Math.round((totalCommits * 2.5) / monthsSinceJoined);
   const score = calculateBuilderScore(totalTokens, launchedCount, totalDownloads, streakDays, hoursPerMonth);
   const percentile = getPercentile(score.total, allScores);
 
@@ -238,6 +240,8 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
         followerCount={followerCount}
         followingCount={followingCount}
         createdAt={profile.created_at}
+        onFollowersClick={() => setFollowListMode("followers")}
+        onFollowingClick={() => setFollowListMode("following")}
       />
 
       {/* Weekly drop card */}
@@ -309,6 +313,15 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
           project={editProject}
           onClose={() => setEditProject(null)}
           onSaved={handleProjectSaved}
+        />
+      )}
+
+      {followListMode && profile && (
+        <FollowListModal
+          profileId={profile.id}
+          mode={followListMode}
+          onClose={() => setFollowListMode(null)}
+          onUserClick={(u) => router.push(`/user/${u}`)}
         />
       )}
 

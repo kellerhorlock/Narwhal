@@ -61,15 +61,15 @@ export function generateGradientSVG(name: string, width = 400, height = 240): st
 
 export function deriveStats(commits: number) {
   return {
-    tokens: commits * 25000,
+    tokens: commits * 750000,
     linesOfCode: commits * 65,
-    hoursBuilding: Math.round(commits * 0.65 * 10) / 10,
-    workDays: Math.round((commits * 0.65) / 8 * 10) / 10,
+    hoursBuilding: Math.round(commits * 2.5 * 10) / 10,
+    workDays: Math.round((commits * 2.5) / 8 * 10) / 10,
   };
 }
 
 export function formatTokens(commits: number): string {
-  const tokens = commits * 25000;
+  const tokens = commits * 750000;
   if (tokens >= 1_000_000) return (tokens / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
   if (tokens >= 1_000) return (tokens / 1_000).toFixed(0) + 'K';
   return tokens.toString();
@@ -125,6 +125,25 @@ const ACTION_VERBS = [
 
 export function getActionVerb(projectName: string): string {
   return ACTION_VERBS[hashString(projectName) % ACTION_VERBS.length];
+}
+
+export function getRecencyAction(lastActivity: string | Date, status: string): string {
+  const now = Date.now();
+  const then = new Date(lastActivity).getTime();
+  const hoursAgo = (now - then) / (1000 * 60 * 60);
+
+  if (status === "published") {
+    if (hoursAgo < 1) return "just shipped";
+    if (hoursAgo < 24) return "shipped today";
+    if (hoursAgo < 48) return "shipped yesterday";
+    return `shipped ${Math.floor(hoursAgo / 24)}d ago`;
+  }
+
+  // active/building
+  if (hoursAgo < 1) return "is working right now on";
+  if (hoursAgo < 24) return "was building today";
+  if (hoursAgo < 48) return "was building yesterday";
+  return `was building ${Math.floor(hoursAgo / 24)}d ago`;
 }
 
 // Builder Score system
@@ -196,7 +215,7 @@ export function generateProjectInsights(
 
   const techStr = techStack.length > 0 ? ` with ${techStack.join(", ")}` : "";
   let main = `Built over ${formatNumber(commits)} commits${techStr}.`;
-  if (stats.tokens > 0) main += ` ~${formatTokens(commits)} tokens consumed, averaging ~25K per commit.`;
+  if (stats.tokens > 0) main += ` ~${formatTokens(commits)} tokens consumed, averaging ~750K per commit.`;
   if (stats.hoursBuilding > 0) main += ` ~${stats.hoursBuilding}h of estimated development time.`;
   if (downloads > 0) main += ` ${formatNumber(downloads)} developers have downloaded this project.`;
   lines.push(main);

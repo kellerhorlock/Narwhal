@@ -52,6 +52,7 @@ export default function FeedPage() {
   const [userTotalDownloads, setUserTotalDownloads] = useState(0);
   const [userEstimatedTokens, setUserEstimatedTokens] = useState(0);
   const [newsEntries, setNewsEntries] = useState<NewsEntry[]>(fallbackNews);
+  const [followingProjects, setFollowingProjects] = useState<(Project & { profiles: Profile })[]>([]);
   const [feedLoading, setFeedLoading] = useState(true);
 
   useEffect(() => {
@@ -127,8 +128,29 @@ export default function FeedPage() {
       const myProjects = (userProjects || []).filter((p) => p.user_id === currentUserId);
       setUserPublishedCount(myProjects.filter((p) => p.status === "published").length);
       setUserTotalDownloads(myProjects.reduce((s, p) => s + (p.downloads || 0), 0));
-      setUserEstimatedTokens(myProjects.reduce((s, p) => s + (p.commits || 0) * 25000, 0));
+      setUserEstimatedTokens(myProjects.reduce((s, p) => s + (p.commits || 0) * 750000, 0));
       setAllDownloads((userProjects || []).map((p) => p.downloads || 0));
+
+      // Load following feed: all activity from followed users (last 7 days, not stealth)
+      const { data: followRows } = await supabase
+        .from("follows")
+        .select("following_id")
+        .eq("follower_id", currentUserId);
+
+      if (followRows && followRows.length > 0) {
+        const followedIds = followRows.map((f) => f.following_id);
+        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        const { data: followedProjects } = await supabase
+          .from("projects")
+          .select("*, profiles(*)")
+          .in("user_id", followedIds)
+          .neq("status", "stealth")
+          .gte("last_activity", sevenDaysAgo)
+          .order("last_activity", { ascending: false });
+        setFollowingProjects((followedProjects || []) as (Project & { profiles: Profile })[]);
+      } else {
+        setFollowingProjects([]);
+      }
 
       setFeedLoading(false);
     }
@@ -137,7 +159,7 @@ export default function FeedPage() {
 
   const mergedFeed = useMemo((): FeedEntry[] => {
     if (feedFilter === "following") {
-      return feedProjects.map((p) => ({ kind: "project" as const, project: p }));
+      return followingProjects.map((p) => ({ kind: "project" as const, project: p }));
     }
 
     const hasProjects = feedProjects.length > 0;
@@ -168,7 +190,7 @@ export default function FeedPage() {
     }
 
     return entries;
-  }, [feedProjects, featuredProjects, feedFilter, newsEntries]);
+  }, [feedProjects, followingProjects, featuredProjects, feedFilter, newsEntries]);
 
   const handleTabChange = useCallback((tab: string) => {
     setView({ tab: tab as Tab });

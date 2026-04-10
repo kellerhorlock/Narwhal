@@ -49,7 +49,7 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
   if (techStr) insightParts.push(`Built with ${techStr} over ${formatNumber(project.commits)} commits.`);
   else if (project.commits > 0) insightParts.push(`Built over ${formatNumber(project.commits)} commits.`);
   if (stats.hoursBuilding > 0) insightParts.push(`~${stats.hoursBuilding} hours of estimated development time.`);
-  if (stats.tokens > 0) insightParts.push(`~${formatTokens(project.commits)} AI tokens consumed, averaging ~25K per commit.`);
+  if (stats.tokens > 0) insightParts.push(`~${formatTokens(project.commits)} AI tokens consumed, averaging ~750K per commit.`);
   if (project.commits > 100) insightParts.push("One of the most actively developed projects on Narwhal.");
   if (project.downloads > 0) insightParts.push(`Downloaded by ${formatNumber(project.downloads)} developers.`);
   const insightText = insightParts.join(" ");

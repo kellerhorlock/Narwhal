@@ -2,7 +2,7 @@
 
 import Avatar from "./Avatar";
 import ProjectCard from "./ProjectCard";
-import { getActionVerb, timeAgo } from "@/lib/helpers";
+import { getRecencyAction, timeAgo } from "@/lib/helpers";
 import type { Project, Profile } from "@/lib/types";
 
 interface FeedItemProps {
@@ -28,7 +28,7 @@ export default function FeedItem({ project, profile, onProjectClick, onUserClick
           >
             {displayName}
           </button>
-          <span className="text-sm ml-1.5" style={{ color: "var(--text-secondary)" }}>{getActionVerb(project.name)}</span>
+          <span className="text-sm ml-1.5" style={{ color: "var(--text-secondary)" }}>{getRecencyAction(project.last_activity, project.status)}</span>
         </span>
         <span className="ml-auto text-xs" style={{ color: "var(--text-muted)" }}>{timeAgo(project.last_activity)}</span>
       </div>

@@ -9,6 +9,8 @@ interface HumanMachineStatsProps {
   followerCount: number;
   followingCount: number;
   createdAt: string;
+  onFollowersClick?: () => void;
+  onFollowingClick?: () => void;
 }
 
 function renderVal(v: number | string | null): string {
@@ -24,6 +26,8 @@ export default function HumanMachineStats({
   launchedCount,
   followerCount,
   followingCount,
+  onFollowersClick,
+  onFollowingClick,
 }: HumanMachineStatsProps) {
   const stats = deriveStats(totalCommits);
   const hoursDisplay = stats.hoursBuilding > 0 ? `~${stats.hoursBuilding}h` : null;
@@ -48,8 +52,8 @@ export default function HumanMachineStats({
           <Stat label="Hours Building" value={hoursDisplay} />
           <Stat label="Projects" value={projectCount} />
           <Stat label="Launched" value={launchedCount} />
-          <Stat label="Followers" value={followerCount} />
-          <Stat label="Following" value={followingCount} />
+          <Stat label="Followers" value={followerCount} onClick={onFollowersClick} />
+          <Stat label="Following" value={followingCount} onClick={onFollowingClick} />
         </div>
       </div>
 
@@ -71,7 +75,7 @@ export default function HumanMachineStats({
           <Stat label="Tokens" value={totalCommits > 0 ? formatTokens(totalCommits) : null} green mono />
           <Stat label="Total Commits" value={totalCommits} mono />
           <Stat label="Est. Lines" value={stats.linesOfCode} mono />
-          <Stat label="Avg Tokens/Commit" value={totalCommits > 0 ? "25K" : null} mono />
+          <Stat label="Avg Tokens/Commit" value={totalCommits > 0 ? "750K" : null} mono />
           <Stat label="Projects" value={projectCount} mono />
         </div>
       </div>
@@ -79,9 +83,9 @@ export default function HumanMachineStats({
   );
 }
 
-function Stat({ label, value, green, mono }: { label: string; value: number | string | null; green?: boolean; mono?: boolean }) {
-  return (
-    <div>
+function Stat({ label, value, green, mono, onClick }: { label: string; value: number | string | null; green?: boolean; mono?: boolean; onClick?: () => void }) {
+  const content = (
+    <>
       <div
         className={`text-[20px] font-bold ${mono ? "font-mono" : ""}`}
         style={{ color: green ? "var(--accent-green)" : "var(--text-primary)" }}
@@ -91,6 +95,16 @@ function Stat({ label, value, green, mono }: { label: string; value: number | st
       <div className="text-[9px] font-medium uppercase tracking-wider mt-0.5" style={{ color: "var(--text-secondary)" }}>
         {label}
       </div>
-    </div>
+    </>
   );
+
+  if (onClick) {
+    return (
+      <button onClick={onClick} className="text-left hover:opacity-80 transition-opacity cursor-pointer">
+        {content}
+      </button>
+    );
+  }
+
+  return <div>{content}</div>;
 }
