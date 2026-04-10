@@ -90,7 +90,7 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
         style={{
           height: 260,
           borderRadius: 16,
-          backgroundImage: project.thumbnail_url
+          backgroundImage: project.thumbnail_url && (!project.thumbnail_url.startsWith("data:") || project.thumbnail_url.length > 5000)
             ? `url("${project.thumbnail_url}")`
             : `url("${generateGradientSVG(project.name, 680, 260)}")`,
         }}

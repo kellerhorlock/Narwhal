@@ -15,7 +15,10 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project, onClick, onContextMenu, isStealth, showMenuButton, onMenuClick, height = 220 }: ProjectCardProps) {
-  const bgImage = project.thumbnail_url
+  const isUsableThumbnail = project.thumbnail_url && (
+    !project.thumbnail_url.startsWith("data:") || project.thumbnail_url.length > 5000
+  );
+  const bgImage = isUsableThumbnail
     ? `url("${project.thumbnail_url}")`
     : `url("${generateGradientSVG(project.name, 860, height)}")`;
 

@@ -97,6 +97,14 @@ D) FIND THUMBNAIL:
    Check README images, /public/og-image.png, /public/screenshot.png, any .png in /public/ or /assets/.
    Convert local images to base64 data URLs. If nothing found, leave null.
 
+   IMPORTANT: We want SCREENSHOTS or PREVIEW IMAGES, not logos or icons.
+   - Skip any image smaller than 10KB — it's probably a logo/icon
+   - Skip any image named 'logo', 'icon', 'favicon', or similar
+   - Look specifically for files named 'screenshot', 'preview', 'hero', 'og-image', 'demo', 'banner'
+   - If the project has a live URL, you can take a screenshot using a headless browser if available
+   - If you only find logos or tiny icons, set thumbnail_url to null — the platform generates beautiful gradient backgrounds as fallback
+   - Only include images that would look good as a full-width card background (landscape orientation, at least 400px wide ideally)
+
 STEP 3 — PRESENT FOR APPROVAL:
 📦 [name]
    [description]
