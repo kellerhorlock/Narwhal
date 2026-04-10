@@ -4,21 +4,21 @@ import type { NewsEntry } from "@/lib/ai-news-feed";
 import { ExternalLink } from "lucide-react";
 
 const categoryBorders: Record<string, string> = {
-  "Model Release": "rgba(56, 189, 248, 0.4)",
-  "Vibe Coding": "rgba(52, 211, 153, 0.4)",
-  "Industry": "rgba(245, 158, 11, 0.4)",
-  "Culture": "rgba(244, 114, 182, 0.4)",
-  "Research": "rgba(56, 189, 248, 0.3)",
-  "Frontier": "rgba(239, 68, 68, 0.4)",
+  "Frontier": "#dc2626",
+  "Model Release": "#0e7490",
+  "Vibe Coding": "#059669",
+  "Industry": "#ea580c",
+  "Culture": "#9333ea",
+  "Research": "#1e40af",
 };
 
 const categoryPills: Record<string, { bg: string; color: string }> = {
-  "Model Release": { bg: "rgba(56, 189, 248, 0.1)", color: "var(--accent-blue)" },
-  "Vibe Coding": { bg: "rgba(52, 211, 153, 0.1)", color: "var(--accent-green)" },
-  "Industry": { bg: "rgba(245, 158, 11, 0.1)", color: "var(--accent-warm)" },
-  "Culture": { bg: "rgba(244, 114, 182, 0.1)", color: "#f472b6" },
-  "Research": { bg: "rgba(56, 189, 248, 0.08)", color: "var(--accent-blue)" },
-  "Frontier": { bg: "rgba(239, 68, 68, 0.1)", color: "#f87171" },
+  "Frontier": { bg: "rgba(220,38,38,0.08)", color: "#dc2626" },
+  "Model Release": { bg: "var(--accent-primary-light)", color: "var(--accent-primary)" },
+  "Vibe Coding": { bg: "rgba(5,150,105,0.08)", color: "#059669" },
+  "Industry": { bg: "rgba(234,88,12,0.08)", color: "#ea580c" },
+  "Culture": { bg: "rgba(147,51,234,0.08)", color: "#9333ea" },
+  "Research": { bg: "rgba(30,64,175,0.08)", color: "#1e40af" },
 };
 
 export default function NewsCard({ entry }: { entry: NewsEntry }) {
@@ -33,6 +33,7 @@ export default function NewsCard({ entry }: { entry: NewsEntry }) {
       className="group flex items-start gap-4 w-full rounded-xl px-4 py-3 transition-colors duration-150"
       style={{
         background: "var(--bg-surface)",
+        border: "1px solid var(--border-default)",
         borderLeft: `3px solid ${border}`,
       }}
       onMouseEnter={(e) => { e.currentTarget.style.background = "var(--bg-hover)"; }}
@@ -50,7 +51,7 @@ export default function NewsCard({ entry }: { entry: NewsEntry }) {
         </div>
         <h3
           className="text-[14px] font-medium leading-snug line-clamp-2 transition-colors duration-150"
-          style={{ color: "var(--text-secondary)" }}
+          style={{ color: "var(--text-primary)" }}
         >
           {entry.title}
         </h3>

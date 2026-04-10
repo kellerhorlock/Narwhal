@@ -30,7 +30,9 @@ export default function WeeklyDropCard({ projects, followerDelta }: WeeklyDropCa
       className="rounded-xl p-5"
       style={{
         background: "var(--bg-surface)",
-        borderLeft: "2px solid rgba(52, 211, 153, 0.15)",
+        border: "1px solid var(--border-default)",
+        borderLeft: "3px solid var(--accent-primary)",
+        boxShadow: "var(--shadow-card)",
       }}
     >
       <div className="flex items-center justify-between mb-3">
@@ -40,9 +42,9 @@ export default function WeeklyDropCard({ projects, followerDelta }: WeeklyDropCa
         <button
           onClick={handleShare}
           className="flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium transition-colors duration-150"
-          style={{ border: "1px solid var(--border-ice)", color: "var(--text-secondary)" }}
+          style={{ border: "1px solid var(--border-default)", color: "var(--text-secondary)" }}
         >
-          {copied ? <Check size={11} style={{ color: "var(--accent-green)" }} /> : <Share2 size={11} />}
+          {copied ? <Check size={11} style={{ color: "var(--accent-success)" }} /> : <Share2 size={11} />}
           {copied ? "Copied!" : "Share"}
         </button>
       </div>
@@ -52,7 +54,7 @@ export default function WeeklyDropCard({ projects, followerDelta }: WeeklyDropCa
           You: <span className="font-mono font-semibold" style={{ color: "var(--text-primary)" }}>{humanHours}</span> building · <span className="font-mono font-semibold" style={{ color: "var(--text-primary)" }}>{projects.length}</span> project{projects.length !== 1 ? "s" : ""}
         </div>
         <div className="text-xs" style={{ color: "var(--text-secondary)" }}>
-          AI: <span className="font-mono font-semibold" style={{ color: "var(--accent-green)" }}>{totalCommits > 0 ? formatTokens(totalCommits) : "0"}</span> tokens · <span className="font-mono font-semibold" style={{ color: "var(--text-primary)" }}>{formatNumber(totalCommits)}</span> commits
+          AI: <span className="font-mono font-semibold" style={{ color: "var(--accent-primary)" }}>{totalCommits > 0 ? formatTokens(totalCommits) : "0"}</span> tokens · <span className="font-mono font-semibold" style={{ color: "var(--text-primary)" }}>{formatNumber(totalCommits)}</span> commits
         </div>
       </div>
 

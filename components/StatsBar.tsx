@@ -29,18 +29,20 @@ export default function StatsBar({ stats }: StatsBarProps) {
       className="grid rounded-xl"
       style={{
         gridTemplateColumns: `repeat(${stats.length}, 1fr)`,
-        background: "rgba(100, 160, 255, 0.025)",
-        border: "1px solid var(--border-subtle)",
+        background: "var(--bg-surface)",
+        border: "1px solid var(--border-default)",
+        boxShadow: "var(--shadow-card)",
       }}
     >
       {stats.map((stat) => (
         <div key={stat.label} className="px-4 py-3.5 text-center">
           <div
-            className={`text-lg font-bold ${stat.green ? "text-accent" : "text-foreground"} ${stat.mono ? "font-mono" : ""}`}
+            className={`text-lg font-bold ${stat.mono ? "font-mono" : ""}`}
+            style={{ color: stat.green ? "var(--accent-primary)" : "var(--text-primary)" }}
           >
             {renderValue(stat.value)}
           </div>
-          <div className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-muted">
+          <div className="mt-0.5 text-[10px] font-medium uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
             {stat.label}
           </div>
         </div>

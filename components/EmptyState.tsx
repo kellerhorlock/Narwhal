@@ -10,7 +10,7 @@ interface EmptyStateProps {
 
 export default function EmptyState({ title, message, actions }: EmptyStateProps) {
   return (
-    <div className="rounded-xl py-20 px-8 text-center" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)" }}>
+    <div className="rounded-xl py-20 px-8 text-center" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", boxShadow: "var(--shadow-card)" }}>
       <NarwhalIcon size={64} className="mx-auto mb-5" style={{ color: "var(--text-muted)" }} animate="float" />
       <p className="text-[20px] font-bold mb-2" style={{ color: "var(--text-primary)" }}>{title}</p>
       <p className="text-sm mb-8 max-w-sm mx-auto" style={{ color: "var(--text-secondary)" }}>{message}</p>
@@ -22,8 +22,8 @@ export default function EmptyState({ title, message, actions }: EmptyStateProps)
               onClick={action.onClick}
               className="rounded-full px-5 py-2 text-sm font-semibold transition-all duration-150"
               style={action.primary
-                ? { background: "var(--accent-green)", color: "#050a12" }
-                : { border: "1px solid var(--border-ice)", color: "var(--text-primary)" }
+                ? { background: "var(--accent-primary)", color: "var(--text-inverse)" }
+                : { border: "1px solid var(--border-strong)", color: "var(--text-primary)" }
               }
             >
               {action.label}

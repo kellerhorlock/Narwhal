@@ -190,7 +190,7 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
 
   return (
     <div>
-      <div className="mb-6" style={{ filter: "drop-shadow(0 0 20px rgba(52, 211, 153, 0.15))" }}>
+      <div className="mb-6" style={{ filter: "drop-shadow(0 0 20px rgba(14,116,144,0.15))" }}>
         <NarwhalIcon size={80} style={{ color: "var(--text-primary)" }} animate="fade-in" />
       </div>
       <h1 className="font-serif italic text-3xl mb-2" style={{ color: "var(--text-primary)" }}>
@@ -203,16 +203,16 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
 
       {/* Content block */}
       {keyLoading ? (
-        <div className="rounded-xl py-20 text-center" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)", color: "var(--text-secondary)" }}>
+        <div className="rounded-xl py-20 text-center" style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)" }}>
           Loading credentials...
         </div>
       ) : keyError ? (
-        <div className="rounded-xl p-6 text-center" style={{ background: "var(--bg-surface)", border: "1px solid rgba(239, 68, 68, 0.2)" }}>
-          <p className="text-sm mb-3" style={{ color: "#f87171" }}>{keyError}</p>
+        <div className="rounded-xl p-6 text-center" style={{ background: "var(--bg-elevated)", border: "1px solid rgba(239, 68, 68, 0.2)" }}>
+          <p className="text-sm mb-3" style={{ color: "var(--accent-danger)" }}>{keyError}</p>
           <button
             onClick={fetchApiKey}
             className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors duration-150"
-            style={{ border: "1px solid var(--border-ice)", color: "var(--text-primary)" }}
+            style={{ border: "1px solid var(--border-default)", color: "var(--text-primary)" }}
           >
             <RefreshCw size={14} />
             Retry
@@ -225,8 +225,8 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
             onClick={handleCopy}
             className="w-full flex items-center justify-center gap-2.5 rounded-xl py-3.5 text-sm font-semibold transition-all duration-200 mb-4"
             style={copied
-              ? { background: "rgba(52, 211, 153, 0.1)", border: "1px solid rgba(52, 211, 153, 0.2)", color: "var(--accent-green)" }
-              : { background: "var(--accent-green)", color: "#050a12" }
+              ? { background: "var(--accent-primary-light)", border: "1px solid rgba(14,116,144,0.2)", color: "var(--accent-primary)" }
+              : { background: "var(--accent-primary)", color: "var(--text-inverse)" }
             }
           >
             {copied ? <Check size={16} /> : <Copy size={16} />}
@@ -244,7 +244,7 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
               What this does
             </button>
             {showExplainerTop && (
-              <div className="mt-3 rounded-xl p-4 text-sm leading-relaxed max-w-xl" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)" }}>
+              <div className="mt-3 rounded-xl p-4 text-sm leading-relaxed max-w-xl" style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)" }}>
                 <p className="mb-2" style={{ color: "var(--text-secondary)" }}>When you paste this prompt into your AI coding agent, it will:</p>
                 <ol className="list-decimal list-inside space-y-1.5" style={{ color: "var(--text-muted)" }}>
                   <li>Scan your machine for all coding project directories</li>
@@ -258,7 +258,7 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
           </div>
 
           {/* Prompt block */}
-          <div className="rounded-xl overflow-hidden mb-4" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)" }}>
+          <div className="rounded-xl overflow-hidden mb-4" style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)" }}>
             <pre className="p-5 text-[13px] font-mono leading-relaxed overflow-x-auto" style={{ color: "var(--text-secondary)" }}>
               {prompt}
             </pre>
@@ -269,8 +269,8 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
             onClick={handleCopy}
             className="w-full flex items-center justify-center gap-2.5 rounded-xl py-3.5 text-sm font-semibold transition-all duration-200"
             style={copied
-              ? { background: "rgba(52, 211, 153, 0.1)", border: "1px solid rgba(52, 211, 153, 0.2)", color: "var(--accent-green)" }
-              : { background: "var(--accent-green)", color: "#050a12" }
+              ? { background: "var(--accent-primary-light)", border: "1px solid rgba(14,116,144,0.2)", color: "var(--accent-primary)" }
+              : { background: "var(--accent-primary)", color: "var(--text-inverse)" }
             }
           >
             {copied ? <Check size={16} /> : <Copy size={16} />}
@@ -288,7 +288,7 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
               What this does
             </button>
             {showExplainerBottom && (
-              <div className="mt-3 rounded-xl p-4 text-sm leading-relaxed max-w-xl" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)" }}>
+              <div className="mt-3 rounded-xl p-4 text-sm leading-relaxed max-w-xl" style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)" }}>
                 <p className="mb-2" style={{ color: "var(--text-secondary)" }}>When you paste this prompt into your AI coding agent, it will:</p>
                 <ol className="list-decimal list-inside space-y-1.5" style={{ color: "var(--text-muted)" }}>
                   <li>Scan your machine for all coding project directories</li>
@@ -302,9 +302,9 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
           </div>
 
           {/* API Key display */}
-          <div className="rounded-xl p-4 mb-10" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)" }}>
+          <div className="rounded-xl p-4 mb-10" style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)" }}>
             <div className="flex items-center gap-2 mb-2">
-              <Key size={14} style={{ color: "var(--accent-green)" }} />
+              <Key size={14} style={{ color: "var(--accent-primary)" }} />
               <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Your API Key</span>
             </div>
             <div className="flex items-center gap-3">
@@ -312,7 +312,7 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
               <button
                 onClick={handleCopyKey}
                 className="flex-shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors duration-150"
-                style={{ border: "1px solid var(--border-ice)", color: "var(--text-secondary)" }}
+                style={{ border: "1px solid var(--border-default)", color: "var(--text-secondary)" }}
               >
                 {keyCopied ? <Check size={12} className="inline" /> : <Copy size={12} className="inline" />}
                 {keyCopied ? " Copied" : " Copy"}
@@ -335,7 +335,7 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
       )}
 
       {/* Divider */}
-      <div className="mb-10" style={{ borderTop: "1px solid var(--border-ice)" }} />
+      <div className="mb-10" style={{ borderTop: "1px solid var(--border-default)" }} />
 
       {/* Manual form */}
       <h2 className="text-lg font-semibold mb-1" style={{ color: "var(--text-primary)" }}>Or add a project manually</h2>
@@ -349,7 +349,7 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
           onChange={(e) => setName(e.target.value)}
           required
           className="rounded-xl px-4 py-3 text-sm outline-none transition-colors duration-150"
-          style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)", color: "var(--text-primary)" }}
+          style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-primary)" }}
         />
         <textarea
           placeholder="Description"
@@ -357,7 +357,7 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
           onChange={(e) => setDescription(e.target.value)}
           rows={3}
           className="rounded-xl px-4 py-3 text-sm outline-none transition-colors duration-150 resize-none"
-          style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)", color: "var(--text-primary)" }}
+          style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-primary)" }}
         />
         <input
           type="text"
@@ -365,27 +365,27 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
           value={techStack}
           onChange={(e) => setTechStack(e.target.value)}
           className="rounded-xl px-4 py-3 text-sm outline-none transition-colors duration-150"
-          style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)", color: "var(--text-primary)" }}
+          style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-primary)" }}
         />
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value as "active" | "published" | "stealth")}
           className="rounded-xl px-4 py-3 text-sm outline-none transition-colors duration-150"
-          style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)", color: "var(--text-primary)" }}
+          style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-primary)" }}
         >
           <option value="active">Active</option>
           <option value="published">Published</option>
           <option value="stealth">Stealth</option>
         </select>
 
-        {formError && <p className="text-sm" style={{ color: "#f87171" }}>{formError}</p>}
-        {formSuccess && <p className="text-sm" style={{ color: "var(--accent-green)" }}>{formSuccess}</p>}
+        {formError && <p className="text-sm" style={{ color: "var(--accent-danger)" }}>{formError}</p>}
+        {formSuccess && <p className="text-sm" style={{ color: "var(--accent-primary)" }}>{formSuccess}</p>}
 
         <button
           type="submit"
           disabled={submitting}
           className="rounded-full py-3 text-sm font-semibold transition-opacity hover:opacity-80 disabled:opacity-50"
-          style={{ background: "var(--accent-green)", color: "#050a12" }}
+          style={{ background: "var(--accent-primary)", color: "var(--text-inverse)" }}
         >
           {submitting ? "Creating..." : "Create Project"}
         </button>

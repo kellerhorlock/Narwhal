@@ -102,14 +102,14 @@ export function timeAgo(date: string | Date): string {
 
 export function getAvatarGradient(name: string): string {
   const gradients = [
-    "linear-gradient(135deg, #667eea, #764ba2)",
-    "linear-gradient(135deg, #f093fb, #f5576c)",
-    "linear-gradient(135deg, #4facfe, #00f2fe)",
-    "linear-gradient(135deg, #43e97b, #38f9d7)",
-    "linear-gradient(135deg, #fa709a, #fee140)",
-    "linear-gradient(135deg, #a18cd1, #fbc2eb)",
-    "linear-gradient(135deg, #667eea, #38ef7d)",
-    "linear-gradient(135deg, #e2b0ff, #9f44d3)",
+    "linear-gradient(135deg, #0e7490, #164e63)",
+    "linear-gradient(135deg, #0284c7, #0369a1)",
+    "linear-gradient(135deg, #475569, #1e293b)",
+    "linear-gradient(135deg, #0891b2, #155e75)",
+    "linear-gradient(135deg, #6366f1, #4338ca)",
+    "linear-gradient(135deg, #7c3aed, #4c1d95)",
+    "linear-gradient(135deg, #2563eb, #1e40af)",
+    "linear-gradient(135deg, #0d9488, #115e59)",
   ];
   return gradients[hashString(name) % gradients.length];
 }

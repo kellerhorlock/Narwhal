@@ -94,7 +94,7 @@ export default function SearchView({ onProjectClick, onUserClick }: SearchViewPr
   return (
     <div>
       <h1 className="font-serif italic mb-3" style={{ fontSize: 36, color: "var(--text-primary)" }}>Search</h1>
-      <p className="mb-6 text-[14px]" style={{ color: "var(--text-secondary)" }}>Find builders and projects</p>
+      <p className="mb-6 text-[14px]" style={{ color: "var(--text-muted)" }}>Find builders and projects</p>
 
       {/* Search input */}
       <div className="relative max-w-[480px] mb-5">
@@ -105,20 +105,20 @@ export default function SearchView({ onProjectClick, onUserClick }: SearchViewPr
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="w-full rounded-xl pl-10 pr-4 py-2.5 text-[15px] outline-none transition-colors duration-150"
-          style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)", color: "var(--text-primary)" }}
+          style={{ background: "var(--bg-input)", border: "1px solid var(--border-default)", color: "var(--text-primary)" }}
         />
       </div>
 
       {/* Toggle */}
-      <div className="flex max-w-[240px] rounded-lg p-1 mb-6" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)" }}>
+      <div className="flex max-w-[240px] rounded-lg p-1 mb-6" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)" }}>
         {(["users", "projects"] as const).map((m) => (
           <button
             key={m}
             onClick={() => { setMode(m); setActiveTag(null); }}
             className="flex-1 rounded-md px-4 py-1.5 text-[12px] font-semibold capitalize transition-colors duration-150"
             style={{
-              background: mode === m ? "var(--bg-hover)" : undefined,
-              color: mode === m ? "var(--text-primary)" : "var(--text-secondary)",
+              background: mode === m ? "var(--accent-primary)" : undefined,
+              color: mode === m ? "var(--text-inverse)" : "var(--text-secondary)",
             }}
           >
             {m}
@@ -146,7 +146,7 @@ export default function SearchView({ onProjectClick, onUserClick }: SearchViewPr
                   key={user.id}
                   onClick={() => onUserClick(user.username)}
                   className="flex items-center gap-3.5 rounded-xl px-4 py-3 transition-colors duration-150 text-left"
-                  onMouseEnter={(e) => { e.currentTarget.style.background = "var(--bg-surface)"; }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = "var(--bg-hover)"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.background = ""; }}
                 >
                   <Avatar name={displayName} size={44} />
@@ -154,14 +154,14 @@ export default function SearchView({ onProjectClick, onUserClick }: SearchViewPr
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>{displayName}</span>
                       {user.streak_days >= 7 && (
-                        <span className="text-xs" style={{ color: "var(--accent-warm)" }}>{user.streak_days}d</span>
+                        <span className="text-xs rounded-full px-2 py-0.5" style={{ background: "#fff7ed", color: "var(--accent-warm)" }}>{user.streak_days}d</span>
                       )}
                     </div>
                     <div className="text-xs font-mono" style={{ color: "var(--text-secondary)" }}>
                       @{user.username} · {projectCount} project{projectCount !== 1 ? "s" : ""} · {formatNumber(totalCommits)} commits
                     </div>
                   </div>
-                  <span className="text-sm font-mono font-semibold" style={{ color: "var(--accent-green)" }}>
+                  <span className="text-sm font-mono font-semibold" style={{ color: "var(--accent-primary)" }}>
                     {formatNumber(user.total_tokens_used)}
                   </span>
                 </button>
@@ -179,8 +179,8 @@ export default function SearchView({ onProjectClick, onUserClick }: SearchViewPr
                 onClick={() => handleTagClick(tag)}
                 className="flex-shrink-0 rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors duration-150"
                 style={activeTag === tag
-                  ? { background: "rgba(52, 211, 153, 0.1)", color: "var(--accent-green)", border: "1px solid rgba(52, 211, 153, 0.2)" }
-                  : { border: "1px solid var(--border-ice)", color: "var(--text-secondary)" }
+                  ? { background: "var(--accent-primary-light)", color: "var(--accent-primary)", border: "1px solid rgba(14,116,144,0.2)" }
+                  : { border: "1px solid var(--border-default)", color: "var(--text-secondary)" }
                 }
               >
                 {tag}{tagCounts[tag] > 0 ? ` (${tagCounts[tag]})` : ""}

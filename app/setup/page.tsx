@@ -36,14 +36,14 @@ export default function SetupPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center" style={{ background: "var(--bg-deep)" }}>
+      <div className="flex min-h-screen items-center justify-center" style={{ background: "var(--bg-primary)" }}>
         <NarwhalIcon size={40} style={{ color: "var(--text-muted)" }} animate="pulse" />
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen" style={{ background: "var(--bg-deep)", color: "var(--text-primary)" }}>
+    <div className="flex min-h-screen" style={{ background: "var(--bg-primary)", color: "var(--text-primary)" }}>
       <Sidebar
         activeTab="setup"
         onTabChange={() => router.push("/feed")}

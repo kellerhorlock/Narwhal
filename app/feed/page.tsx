@@ -222,7 +222,7 @@ export default function FeedPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center" style={{ background: "var(--bg-deep)" }}>
+      <div className="flex min-h-screen items-center justify-center" style={{ background: "var(--bg-primary)" }}>
         <NarwhalIcon size={40} style={{ color: "var(--text-muted)" }} animate="pulse" />
       </div>
     );
@@ -231,7 +231,7 @@ export default function FeedPage() {
   const showingDetail = !!view.projectDetail;
 
   return (
-    <div className="flex min-h-screen" style={{ background: "var(--bg-deep)", color: "var(--text-primary)" }}>
+    <div className="flex min-h-screen" style={{ background: "var(--bg-primary)", color: "var(--text-primary)" }}>
       {/* Desktop sidebar */}
       <div className="hidden md:block">
         <Sidebar
@@ -263,13 +263,13 @@ export default function FeedPage() {
               <p className="mb-6 text-[14px]" style={{ color: "var(--text-secondary)" }}>What builders are shipping right now</p>
 
               {/* Feed filter tabs */}
-              <div className="flex gap-1 mb-8 rounded-lg p-1" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)", width: "fit-content" }}>
+              <div className="flex gap-1 mb-8 rounded-lg p-1" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", width: "fit-content" }}>
                 <button
                   onClick={() => setFeedFilter("all")}
                   className="rounded-md px-4 py-1.5 text-[12px] font-medium transition-colors duration-150"
                   style={{
-                    background: feedFilter === "all" ? "var(--bg-hover)" : undefined,
-                    color: feedFilter === "all" ? "var(--text-primary)" : "var(--text-secondary)",
+                    background: feedFilter === "all" ? "var(--accent-primary)" : undefined,
+                    color: feedFilter === "all" ? "var(--text-inverse)" : "var(--text-secondary)",
                   }}
                 >
                   All
@@ -278,8 +278,8 @@ export default function FeedPage() {
                   onClick={() => setFeedFilter("following")}
                   className="rounded-md px-4 py-1.5 text-[12px] font-medium transition-colors duration-150"
                   style={{
-                    background: feedFilter === "following" ? "var(--bg-hover)" : undefined,
-                    color: feedFilter === "following" ? "var(--text-primary)" : "var(--text-secondary)",
+                    background: feedFilter === "following" ? "var(--accent-primary)" : undefined,
+                    color: feedFilter === "following" ? "var(--text-inverse)" : "var(--text-secondary)",
                   }}
                 >
                   Following
@@ -321,8 +321,8 @@ export default function FeedPage() {
                       return (
                         <div key={`feat-${item.project.id}`}>
                           <div className="mb-3 flex items-center gap-2.5">
-                            <Star size={14} style={{ color: "var(--accent-green)" }} />
-                            <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--accent-green)" }}>Featured Builder</span>
+                            <Star size={14} style={{ color: "var(--accent-primary)" }} />
+                            <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--accent-primary)" }}>Featured Builder</span>
                             <span className="text-xs" style={{ color: "var(--text-muted)" }}>·</span>
                             <button
                               onClick={() => handleUserClick(profile.username)}
@@ -403,8 +403,10 @@ function MobileTabBar({ activeTab, onTabChange }: { activeTab: string; onTabChan
     <nav
       className="fixed bottom-0 left-0 right-0 z-50 flex md:hidden border-t"
       style={{
-        background: "rgba(5,10,18,0.98)",
-        borderColor: "var(--border-ice)",
+        background: "rgba(248, 250, 251, 0.95)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        borderColor: "var(--border-default)",
         paddingBottom: "env(safe-area-inset-bottom)",
       }}
     >
@@ -415,7 +417,7 @@ function MobileTabBar({ activeTab, onTabChange }: { activeTab: string; onTabChan
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
             className="flex-1 flex flex-col items-center gap-1 py-2.5 transition-colors"
-            style={{ color: active ? "var(--accent-green)" : "var(--text-muted)" }}
+            style={{ color: active ? "var(--accent-primary)" : "var(--text-muted)" }}
           >
             {tab.icon}
             <span className="text-[10px] font-semibold">{tab.label}</span>

@@ -29,7 +29,9 @@ export default function DailyBriefing({ currentUser, feedProjects, allUsers, tre
       className="rounded-xl p-5"
       style={{
         background: "var(--bg-surface)",
-        borderLeft: "2px solid rgba(52, 211, 153, 0.15)",
+        border: "1px solid var(--border-default)",
+        borderLeft: "3px solid var(--accent-primary)",
+        boxShadow: "var(--shadow-card)",
       }}
     >
       <h2 className="text-[18px] font-semibold mb-2" style={{ color: "var(--text-primary)" }}>
@@ -46,7 +48,7 @@ export default function DailyBriefing({ currentUser, feedProjects, allUsers, tre
         {topBuilder && topBuilder.tokens_today > 0 && (
           <p>
             Community highlight: <span className="font-medium" style={{ color: "var(--text-primary)" }}>{topBuilder.display_name || topBuilder.username}</span> hit{" "}
-            <span className="font-mono" style={{ color: "var(--accent-green)" }}>{formatNumber(topBuilder.tokens_today)}</span> tokens today.
+            <span className="font-mono" style={{ color: "var(--accent-primary)" }}>{formatNumber(topBuilder.tokens_today)}</span> tokens today.
           </p>
         )}
         {trendingNews && (

@@ -93,22 +93,22 @@ export default function EditProjectModal({ project, onClose, onSaved }: EditProj
     { key: "downloads", label: "Downloads" },
   ];
 
-  const inputStyle = { background: "var(--bg-surface)", border: "1px solid var(--border-ice)", color: "var(--text-primary)" };
+  const inputStyle = { background: "var(--bg-input)", border: "1px solid var(--border-default)", color: "var(--text-primary)" };
 
   return (
     <div
       className="fixed inset-0 z-[1000] flex items-center justify-center"
-      style={{ background: "rgba(0,0,0,0.7)" }}
+      style={{ background: "rgba(15, 23, 42, 0.4)" }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
         className="relative w-full max-w-[520px] max-h-[90vh] overflow-y-auto rounded-2xl p-6"
-        style={{ background: "var(--bg-deep)", border: "1px solid var(--border-ice)" }}
+        style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", boxShadow: "var(--shadow-lg)" }}
       >
         <button
           onClick={onClose}
           className="absolute top-4 right-4 transition-colors duration-150"
-          style={{ color: "var(--text-secondary)" }}
+          style={{ color: "var(--text-muted)" }}
         >
           <X size={20} />
         </button>
@@ -129,7 +129,7 @@ export default function EditProjectModal({ project, onClose, onSaved }: EditProj
             <button
               onClick={() => fileInputRef.current?.click()}
               className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm transition-colors duration-150"
-              style={{ border: "1px solid var(--border-ice)", color: "var(--text-secondary)" }}
+              style={{ border: "1px solid var(--border-default)", color: "var(--text-secondary)" }}
             >
               <Upload size={14} />
               Change Image
@@ -137,7 +137,7 @@ export default function EditProjectModal({ project, onClose, onSaved }: EditProj
             <button
               onClick={handleRegenerate}
               className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm transition-colors duration-150"
-              style={{ border: "1px solid var(--border-ice)", color: "var(--text-secondary)" }}
+              style={{ border: "1px solid var(--border-default)", color: "var(--text-secondary)" }}
             >
               <RefreshCw size={14} />
               Regenerate
@@ -221,7 +221,7 @@ export default function EditProjectModal({ project, onClose, onSaved }: EditProj
             value={status}
             onChange={(e) => setStatus(e.target.value as "active" | "published" | "stealth")}
             className="w-full rounded-lg px-3 py-2 text-sm outline-none transition-colors duration-150"
-            style={{ ...inputStyle, background: "var(--bg-deep)" }}
+            style={inputStyle}
           >
             <option value="active">Building</option>
             <option value="published">Published</option>
@@ -239,14 +239,14 @@ export default function EditProjectModal({ project, onClose, onSaved }: EditProj
                   key={stat.key}
                   onClick={() => toggleStat(stat.key)}
                   className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors duration-150"
-                  style={{ border: "1px solid var(--border-ice)" }}
+                  style={{ border: "1px solid var(--border-default)" }}
                 >
-                  <span style={{ color: isHidden ? "var(--text-muted)" : "var(--text-secondary)" }}>
+                  <span style={{ color: isHidden ? "var(--text-muted)" : "var(--text-primary)" }}>
                     {stat.label}
                   </span>
                   <div
                     className="relative w-9 h-5 rounded-full transition-colors duration-200"
-                    style={{ background: isHidden ? "var(--text-muted)" : "var(--accent-green)" }}
+                    style={{ background: isHidden ? "var(--border-strong)" : "var(--accent-primary)" }}
                   >
                     <div
                       className="absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform duration-200"
@@ -264,14 +264,14 @@ export default function EditProjectModal({ project, onClose, onSaved }: EditProj
             onClick={handleSave}
             disabled={saving || !name.trim()}
             className="flex-1 rounded-lg py-2.5 text-sm font-semibold transition-opacity disabled:opacity-40"
-            style={{ background: "var(--accent-green)", color: "#050a12" }}
+            style={{ background: "var(--accent-primary)", color: "var(--text-inverse)" }}
           >
             {saving ? "Saving..." : "Save Changes"}
           </button>
           <button
             onClick={onClose}
             className="rounded-lg px-5 py-2.5 text-sm font-medium transition-colors duration-150"
-            style={{ border: "1px solid var(--border-ice)", color: "var(--text-secondary)" }}
+            style={{ border: "1px solid var(--border-default)", color: "var(--text-secondary)" }}
           >
             Cancel
           </button>

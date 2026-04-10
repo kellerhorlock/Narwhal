@@ -210,8 +210,8 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
               onClick={toggleFollow}
               className="rounded-full px-5 py-2 text-[13px] font-semibold transition-colors duration-150"
               style={isFollowing
-                ? { border: "1px solid var(--border-ice)", color: "var(--text-primary)" }
-                : { background: "var(--accent-green)", color: "#050a12" }
+                ? { border: "1px solid var(--border-default)", color: "var(--text-primary)" }
+                : { background: "var(--accent-primary)", color: "var(--text-inverse)" }
               }
             >
               {isFollowing ? "Following" : "Follow"}
@@ -328,10 +328,10 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
       {deleteProject && (
         <div
           className="fixed inset-0 z-[1000] flex items-center justify-center"
-          style={{ background: "rgba(0,0,0,0.7)" }}
+          style={{ background: "rgba(15, 23, 42, 0.4)" }}
           onClick={(e) => { if (e.target === e.currentTarget) setDeleteProject(null); }}
         >
-          <div className="rounded-2xl p-6 max-w-[380px] w-full" style={{ background: "var(--bg-deep)", border: "1px solid var(--border-ice)" }}>
+          <div className="rounded-2xl p-6 max-w-[380px] w-full" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", boxShadow: "var(--shadow-lg)" }}>
             <h3 className="text-lg font-bold mb-2" style={{ color: "var(--text-primary)" }}>Delete Project</h3>
             <p className="text-sm mb-5" style={{ color: "var(--text-secondary)" }}>
               Are you sure you want to delete <strong style={{ color: "var(--text-primary)" }}>{deleteProject.name}</strong>? This cannot be undone.
@@ -340,14 +340,14 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
               <button
                 onClick={() => handleDelete(deleteProject)}
                 className="flex-1 rounded-lg py-2.5 text-sm font-semibold text-white transition-colors"
-                style={{ background: "rgba(239, 68, 68, 0.8)" }}
+                style={{ background: "var(--accent-danger)" }}
               >
                 Delete
               </button>
               <button
                 onClick={() => setDeleteProject(null)}
                 className="flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors"
-                style={{ border: "1px solid var(--border-ice)", color: "var(--text-secondary)" }}
+                style={{ border: "1px solid var(--border-default)", color: "var(--text-secondary)" }}
               >
                 Cancel
               </button>

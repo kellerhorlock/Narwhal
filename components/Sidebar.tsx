@@ -52,8 +52,9 @@ export default function Sidebar({ activeTab, onTabChange, profile, publishedCoun
     <aside
       className="fixed left-0 top-0 bottom-0 flex w-[240px] flex-col px-4 py-6 z-50"
       style={{
-        background: "var(--bg-deep)",
-        borderRight: "1px solid rgba(56, 200, 255, 0.04)",
+        background: "var(--bg-surface)",
+        borderRight: "1px solid var(--border-default)",
+        boxShadow: "1px 0 3px rgba(15,23,42,0.03)",
       }}
     >
       {/* Logo */}
@@ -74,14 +75,14 @@ export default function Sidebar({ activeTab, onTabChange, profile, publishedCoun
               className="flex items-center gap-3 rounded-lg text-sm transition-colors duration-150"
               style={{
                 padding: "10px 16px",
-                background: active ? "var(--bg-hover)" : undefined,
+                background: active ? "var(--accent-primary-light)" : undefined,
                 color: active ? "var(--text-primary)" : "var(--text-secondary)",
-                borderLeft: `2px solid ${active ? "var(--accent-green)" : "transparent"}`,
+                borderLeft: `2px solid ${active ? "var(--accent-primary)" : "transparent"}`,
               }}
-              onMouseEnter={(e) => { if (!active) { e.currentTarget.style.background = "var(--bg-surface)"; e.currentTarget.style.color = "var(--text-primary)"; } }}
+              onMouseEnter={(e) => { if (!active) { e.currentTarget.style.background = "var(--bg-hover)"; e.currentTarget.style.color = "var(--text-primary)"; } }}
               onMouseLeave={(e) => { if (!active) { e.currentTarget.style.background = ""; e.currentTarget.style.color = "var(--text-secondary)"; } }}
             >
-              <Icon size={18} />
+              <Icon size={18} strokeWidth={1.8} />
               <span>{item.label}</span>
             </button>
           );
@@ -89,7 +90,7 @@ export default function Sidebar({ activeTab, onTabChange, profile, publishedCoun
       </nav>
 
       {/* Divider */}
-      <div className="mx-3 my-3" style={{ borderTop: "1px solid var(--border-ice)" }} />
+      <div className="mx-3 my-3" style={{ borderTop: "1px solid var(--border-default)" }} />
 
       {/* Setup Agent link */}
       <button
@@ -97,14 +98,14 @@ export default function Sidebar({ activeTab, onTabChange, profile, publishedCoun
         className="flex items-center gap-3 rounded-lg text-sm transition-colors duration-150"
         style={{
           padding: "10px 16px",
-          background: activeTab === "setup" ? "var(--bg-hover)" : undefined,
+          background: activeTab === "setup" ? "var(--accent-primary-light)" : undefined,
           color: activeTab === "setup" ? "var(--text-primary)" : "var(--text-secondary)",
-          borderLeft: `2px solid ${activeTab === "setup" ? "var(--accent-green)" : "transparent"}`,
+          borderLeft: `2px solid ${activeTab === "setup" ? "var(--accent-primary)" : "transparent"}`,
         }}
-        onMouseEnter={(e) => { if (activeTab !== "setup") { e.currentTarget.style.background = "var(--bg-surface)"; e.currentTarget.style.color = "var(--text-primary)"; } }}
+        onMouseEnter={(e) => { if (activeTab !== "setup") { e.currentTarget.style.background = "var(--bg-hover)"; e.currentTarget.style.color = "var(--text-primary)"; } }}
         onMouseLeave={(e) => { if (activeTab !== "setup") { e.currentTarget.style.background = ""; e.currentTarget.style.color = "var(--text-secondary)"; } }}
       >
-        <Sparkles size={18} />
+        <Sparkles size={18} strokeWidth={1.8} />
         <span>Setup Agent</span>
       </button>
 
@@ -116,21 +117,21 @@ export default function Sidebar({ activeTab, onTabChange, profile, publishedCoun
 
       {/* User card */}
       {profile && (
-        <div className="rounded-xl p-4" style={{ background: "var(--bg-surface)" }}>
+        <div className="rounded-xl p-4" style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)" }}>
           <div className="flex items-center gap-2.5 mb-2">
             <Avatar name={profile.display_name || profile.username} size={32} />
             <div className="min-w-0 flex-1">
               <div className="text-[13px] font-semibold truncate" style={{ color: "var(--text-primary)" }}>
                 {profile.display_name || profile.username}
               </div>
-              <div className="text-[12px] font-mono truncate" style={{ color: "var(--text-secondary)" }}>@{profile.username}</div>
+              <div className="text-[12px] font-mono truncate" style={{ color: "var(--text-muted)" }}>@{profile.username}</div>
             </div>
           </div>
           <BuilderScoreBadge score={score ? score.total : 0} size="sm" />
           {score && score.total > 0 && !isNaN(score.total) && <div className="mb-1" />}
           <div className="grid grid-cols-3 gap-2 text-center mt-2">
             <div>
-              <div className="text-[13px] font-bold font-mono" style={{ color: "var(--accent-green)" }}>
+              <div className="text-[13px] font-bold font-mono" style={{ color: "var(--accent-primary)" }}>
                 {statDisplay(estimatedTokens)}
               </div>
               <div className="text-[9px] uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Tokens</div>

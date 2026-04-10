@@ -39,12 +39,14 @@ export default function HumanMachineStats({
         className="rounded-xl"
         style={{
           background: "var(--bg-surface)",
-          borderLeft: "2px solid rgba(248, 180, 100, 0.15)",
+          border: "1px solid var(--border-default)",
+          borderLeft: "3px solid #f59e0b",
           padding: "20px 24px",
+          boxShadow: "var(--shadow-card)",
         }}
       >
         <div className="mb-4">
-          <span className="text-[10px] font-medium uppercase tracking-widest" style={{ color: "rgba(248, 180, 100, 0.5)" }}>
+          <span className="text-[10px] font-medium uppercase tracking-widest" style={{ color: "#b45309" }}>
             The Human
           </span>
         </div>
@@ -62,17 +64,19 @@ export default function HumanMachineStats({
         className="rounded-xl"
         style={{
           background: "var(--bg-surface)",
-          borderLeft: "2px solid rgba(56, 189, 248, 0.15)",
+          border: "1px solid var(--border-default)",
+          borderLeft: "3px solid var(--accent-primary)",
           padding: "20px 24px",
+          boxShadow: "var(--shadow-card)",
         }}
       >
         <div className="mb-4">
-          <span className="text-[10px] font-medium uppercase tracking-widest" style={{ color: "rgba(56, 189, 248, 0.5)" }}>
+          <span className="text-[10px] font-medium uppercase tracking-widest" style={{ color: "var(--accent-primary)" }}>
             The Machine
           </span>
         </div>
         <div className="grid grid-cols-5 gap-4">
-          <Stat label="Tokens" value={totalCommits > 0 ? formatTokens(totalCommits) : null} green mono />
+          <Stat label="Tokens" value={totalCommits > 0 ? formatTokens(totalCommits) : null} teal mono />
           <Stat label="Total Commits" value={totalCommits} mono />
           <Stat label="Est. Lines" value={stats.linesOfCode} mono />
           <Stat label="Avg Tokens/Commit" value={totalCommits > 0 ? "14.8K" : null} mono />
@@ -83,16 +87,16 @@ export default function HumanMachineStats({
   );
 }
 
-function Stat({ label, value, green, mono, onClick }: { label: string; value: number | string | null; green?: boolean; mono?: boolean; onClick?: () => void }) {
+function Stat({ label, value, teal, mono, onClick }: { label: string; value: number | string | null; teal?: boolean; mono?: boolean; onClick?: () => void }) {
   const content = (
     <>
       <div
         className={`text-[20px] font-bold ${mono ? "font-mono" : ""}`}
-        style={{ color: green ? "var(--accent-green)" : "var(--text-primary)" }}
+        style={{ color: teal ? "var(--accent-primary)" : "var(--text-primary)" }}
       >
         {renderVal(value)}
       </div>
-      <div className="text-[9px] font-medium uppercase tracking-wider mt-0.5" style={{ color: "var(--text-secondary)" }}>
+      <div className="text-[9px] font-medium uppercase tracking-wider mt-0.5" style={{ color: "var(--text-muted)" }}>
         {label}
       </div>
     </>

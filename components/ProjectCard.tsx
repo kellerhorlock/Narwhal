@@ -33,24 +33,25 @@ export default function ProjectCard({ project, onClick, onContextMenu, isStealth
       className="group relative w-full overflow-hidden cursor-pointer"
       style={{
         height,
-        borderRadius: 16,
+        borderRadius: "var(--radius-xl)",
+        boxShadow: "var(--shadow-lg)",
         transition: "transform 0.2s ease, box-shadow 0.2s ease",
       }}
-      onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,0,0,0.3)"; }}
-      onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+      onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(15,23,42,0.12)"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "var(--shadow-lg)"; }}
     >
       {/* Background image */}
       <div
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: bgImage, borderRadius: 16 }}
+        style={{ backgroundImage: bgImage, borderRadius: "var(--radius-xl)" }}
       />
 
       {/* Bottom gradient overlay */}
       <div
         className="absolute inset-0"
         style={{
-          background: "linear-gradient(to top, rgba(5,10,18,0.85) 0%, transparent 60%)",
-          borderRadius: 16,
+          background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 60%)",
+          borderRadius: "var(--radius-xl)",
         }}
       />
 
@@ -59,10 +60,10 @@ export default function ProjectCard({ project, onClick, onContextMenu, isStealth
         <div
           className="absolute inset-0 z-10"
           style={{
-            background: "rgba(5,10,18,0.5)",
+            background: "rgba(0,0,0,0.4)",
             backdropFilter: "blur(3px)",
             WebkitBackdropFilter: "blur(3px)",
-            borderRadius: 16,
+            borderRadius: "var(--radius-xl)",
           }}
         />
       )}
@@ -98,9 +99,9 @@ export default function ProjectCard({ project, onClick, onContextMenu, isStealth
         {isStealth ? (
           <EyeOff size={18} style={{ color: "rgba(255,255,255,0.4)" }} />
         ) : project.status === "published" ? (
-          <Eye size={18} style={{ color: "var(--accent-green)" }} />
+          <Eye size={18} style={{ color: "rgba(255,255,255,0.7)" }} />
         ) : (
-          <Eye size={18} style={{ color: "var(--accent-blue)" }} />
+          <Eye size={18} style={{ color: "rgba(255,255,255,0.5)" }} />
         )}
       </div>
     </div>

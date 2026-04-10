@@ -56,11 +56,11 @@ export default function ContextMenu({ x, y, isPublished, onPublish, onMoveToStea
   return (
     <div ref={ref} style={menuStyle}>
       <div
-        className="rounded-xl py-1.5 min-w-[180px] backdrop-blur-xl"
+        className="rounded-xl py-1.5 min-w-[180px]"
         style={{
-          background: "rgba(10, 16, 32, 0.95)",
-          border: "1px solid var(--border-ice)",
-          boxShadow: "0 12px 40px rgba(0,0,0,0.5)",
+          background: "var(--bg-surface)",
+          border: "1px solid var(--border-default)",
+          boxShadow: "var(--shadow-lg)",
         }}
       >
         {items.map((item) => (
@@ -72,8 +72,8 @@ export default function ContextMenu({ x, y, isPublished, onPublish, onMoveToStea
               onClose();
             }}
             className="flex w-full items-center gap-2.5 px-4 py-2 text-sm transition-colors duration-100"
-            style={{ color: item.danger ? "#f87171" : "var(--text-secondary)" }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = item.danger ? "rgba(239,68,68,0.1)" : "var(--bg-hover)"; }}
+            style={{ color: item.danger ? "var(--accent-danger)" : "var(--text-primary)" }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = item.danger ? "rgba(220,38,38,0.06)" : "var(--bg-hover)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = ""; }}
           >
             <item.icon size={14} />

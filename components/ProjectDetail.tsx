@@ -37,7 +37,7 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
   }
 
   const allStats = [
-    { key: "tokens", label: "Tokens", value: stats.tokens, display: formatTokens(project.commits), green: true },
+    { key: "tokens", label: "Tokens", value: stats.tokens, display: formatTokens(project.commits), teal: true },
     { key: "commits", label: "Commits", value: project.commits },
     { key: "lines_changed", label: "Est. Lines", value: stats.linesOfCode },
     { key: "est_work_time", label: "Est. Hours", value: stats.hoursBuilding, display: `${stats.hoursBuilding}h` },
@@ -63,9 +63,9 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
         <button
           onClick={onBack}
           className="flex items-center gap-1.5 text-sm transition-colors duration-150"
-          style={{ color: "var(--text-secondary)" }}
+          style={{ color: "var(--text-muted)" }}
           onMouseEnter={(e) => { e.currentTarget.style.color = "var(--text-primary)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-secondary)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-muted)"; }}
         >
           <ArrowLeft size={16} />
           Back
@@ -74,9 +74,9 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
           <button
             onClick={() => setShowEdit(true)}
             className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm transition-colors duration-150"
-            style={{ border: "1px solid var(--border-ice)", color: "var(--text-secondary)" }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = "var(--text-primary)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-secondary)"; }}
+            style={{ border: "1px solid var(--border-default)", color: "var(--text-secondary)" }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "var(--text-primary)"; e.currentTarget.style.background = "var(--bg-hover)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-secondary)"; e.currentTarget.style.background = ""; }}
           >
             <Pencil size={14} />
             Edit
@@ -89,7 +89,8 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
         className="w-full bg-cover bg-center mb-6"
         style={{
           height: 260,
-          borderRadius: 16,
+          borderRadius: "var(--radius-lg)",
+          boxShadow: "var(--shadow-lg)",
           backgroundImage: project.thumbnail_url && (!project.thumbnail_url.startsWith("data:") || project.thumbnail_url.length > 5000)
             ? `url("${project.thumbnail_url}")`
             : `url("${generateGradientSVG(project.name, 680, 260)}")`,
@@ -103,8 +104,10 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
           className="rounded-full px-3 py-1 text-xs font-semibold"
           style={
             project.status === "published"
-              ? { background: "rgba(52,211,153,0.1)", color: "var(--accent-green)" }
-              : { background: "var(--bg-surface)", color: "var(--text-secondary)" }
+              ? { background: "var(--accent-primary-light)", color: "var(--accent-primary)" }
+              : project.status === "stealth"
+              ? { background: "var(--bg-elevated)", color: "var(--text-muted)" }
+              : { background: "#dbeafe", color: "#1e40af" }
           }
         >
           {statusLabel}
@@ -114,7 +117,7 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
             onClick={toggleVisibility}
             disabled={toggling}
             className="flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition-colors duration-150 disabled:opacity-50"
-            style={{ border: "1px solid var(--border-ice)" }}
+            style={{ border: "1px solid var(--border-default)" }}
           >
             {project.status === "published" ? (
               <>
@@ -123,8 +126,8 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
               </>
             ) : (
               <>
-                <Eye size={14} style={{ color: "var(--accent-green)" }} />
-                <span style={{ color: "var(--accent-green)" }}>Publish</span>
+                <Eye size={14} style={{ color: "var(--accent-primary)" }} />
+                <span style={{ color: "var(--accent-primary)" }}>Publish</span>
               </>
             )}
           </button>
@@ -137,7 +140,7 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
         className="flex items-center gap-2.5 mb-5 transition-opacity duration-150 hover:opacity-80"
       >
         <Avatar name={displayName} size={24} />
-        <span className="text-sm font-mono" style={{ color: "var(--text-secondary)" }}>@{profile.username}</span>
+        <span className="text-sm font-mono" style={{ color: "var(--text-muted)" }}>@{profile.username}</span>
         {project.created_at && (
           <span className="text-[13px]" style={{ color: "var(--text-muted)" }}>· Created {timeAgo(project.created_at)}</span>
         )}
@@ -157,7 +160,7 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 rounded-lg px-4 py-2.5 text-[13px] font-medium transition-opacity duration-150 hover:opacity-90"
-              style={{ background: "var(--accent-green)", color: "#050a12" }}
+              style={{ background: "var(--accent-primary)", color: "var(--text-inverse)" }}
             >
               Visit Project
               <ExternalLink size={14} />
@@ -169,7 +172,9 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 rounded-lg px-4 py-2.5 text-[13px] font-medium transition-colors duration-150"
-              style={{ border: "1px solid var(--border-ice)", color: "var(--text-secondary)" }}
+              style={{ border: "1px solid var(--border-strong)", color: "var(--text-primary)" }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "var(--bg-hover)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = ""; }}
             >
               Download
               <Download size={14} />
@@ -182,8 +187,8 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
       {visibleStats.length > 0 && (
         <div className="grid grid-cols-4 gap-3 mb-6">
           {visibleStats.map((stat) => (
-            <div key={stat.key} className="rounded-lg px-4 py-3 text-center" style={{ background: "var(--bg-surface)" }}>
-              <div className="text-[18px] font-bold font-mono" style={{ color: stat.green ? "var(--accent-green)" : "var(--text-primary)" }}>
+            <div key={stat.key} className="rounded-lg px-4 py-3 text-center" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", boxShadow: "var(--shadow-card)" }}>
+              <div className="text-[18px] font-bold font-mono" style={{ color: stat.teal ? "var(--accent-primary)" : "var(--text-primary)" }}>
                 {stat.display ? stat.display : (stat.value ? formatNumber(stat.value) : "\u2014")}
               </div>
               <div className="mt-0.5 text-[9px] font-medium uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
@@ -203,7 +208,7 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
               <span
                 key={tech}
                 className="rounded-lg px-3 py-1.5 text-[12px] font-mono"
-                style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)", color: "var(--text-secondary)" }}
+                style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-default)", color: "var(--text-secondary)" }}
               >
                 {tech}
               </span>
@@ -214,7 +219,7 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
 
       {/* AI Insights */}
       {insightText && (
-        <div className="mb-6 pl-4" style={{ borderLeft: "2px solid rgba(52, 211, 153, 0.1)" }}>
+        <div className="mb-6 pl-4" style={{ borderLeft: "2px solid var(--accent-primary-light)" }}>
           <p className="text-[13px] italic" style={{ lineHeight: 1.7, color: "var(--text-secondary)" }}>{insightText}</p>
         </div>
       )}

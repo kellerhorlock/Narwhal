@@ -101,20 +101,20 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
   return (
     <div>
       <h1 className="font-serif italic mb-3" style={{ fontSize: 36, color: "var(--text-primary)" }}>Leaderboard</h1>
-      <p className="mb-6 text-[14px]" style={{ color: "var(--text-secondary)" }}>
+      <p className="mb-6 text-[14px]" style={{ color: "var(--text-muted)" }}>
         {mode === "score" ? "Builder score rankings" : "Token consumption rankings"}
       </p>
 
       {/* Toggle */}
-      <div className="flex max-w-[380px] rounded-lg p-1 mb-8" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-ice)" }}>
+      <div className="flex max-w-[380px] rounded-lg p-1 mb-8" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)" }}>
         {(["everyone", "following", "score"] as const).map((m) => (
           <button
             key={m}
             onClick={() => setMode(m)}
             className="flex-1 rounded-md px-4 py-1.5 text-[12px] font-semibold capitalize transition-colors duration-150"
             style={{
-              background: mode === m ? "var(--bg-hover)" : undefined,
-              color: mode === m ? "var(--text-primary)" : "var(--text-secondary)",
+              background: mode === m ? "var(--accent-primary)" : undefined,
+              color: mode === m ? "var(--text-inverse)" : "var(--text-secondary)",
             }}
           >
             {m === "score" ? "Builder Score" : m}
@@ -155,9 +155,9 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
                     />
                     <span className="text-sm font-semibold flex items-center gap-1" style={{ color: "var(--text-primary)" }}>
                       {displayName}
-                      {actualRank === 0 && <NarwhalIcon size={20} style={{ color: "var(--accent-green)" }} />}
+                      {actualRank === 0 && <NarwhalIcon size={20} style={{ color: "var(--accent-primary)" }} />}
                     </span>
-                    <span className="text-sm font-mono font-bold" style={{ color: "var(--accent-green)" }}>
+                    <span className="text-sm font-mono font-bold" style={{ color: "var(--accent-primary)" }}>
                       {formatNumber(getDisplayValue(user))}
                     </span>
                     <span className="text-[10px] uppercase" style={{ color: "var(--text-muted)" }}>{valueLabel}</span>
@@ -165,7 +165,9 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
                       className="w-20 rounded-t-lg"
                       style={{
                         height: barHeights[i],
-                        background: "var(--bg-surface)",
+                        background: "var(--bg-elevated)",
+                        border: "1px solid var(--border-default)",
+                        borderBottom: "none",
                       }}
                     />
                   </button>
@@ -180,10 +182,10 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
 
           {/* Table */}
           {rest.length > 0 && (
-            <div className="rounded-xl overflow-hidden" style={{ background: "var(--bg-surface)" }}>
+            <div className="rounded-xl overflow-hidden" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)" }}>
               <div
                 className="grid grid-cols-[48px_1fr_120px_120px_100px] px-4 py-2.5 text-[10px] font-medium uppercase tracking-wider"
-                style={{ color: "var(--text-muted)", borderBottom: "1px solid var(--border-ice)" }}
+                style={{ color: "var(--text-muted)", borderBottom: "1px solid var(--border-default)" }}
               >
                 <span>#</span>
                 <span>Builder</span>
@@ -199,7 +201,7 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
                     key={user.id}
                     onClick={() => onUserClick(user.username)}
                     className="grid grid-cols-[48px_1fr_120px_120px_100px] w-full items-center px-4 py-3 text-left transition-colors duration-150"
-                    style={{ borderBottom: "1px solid var(--border-ice)" }}
+                    style={{ borderBottom: "1px solid var(--border-default)" }}
                     onMouseEnter={(e) => { e.currentTarget.style.background = "var(--bg-hover)"; }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = ""; }}
                   >
@@ -211,7 +213,7 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
                         <div className="text-xs font-mono truncate" style={{ color: "var(--text-secondary)" }}>@{user.username}</div>
                       </div>
                     </div>
-                    <span className="text-right text-sm font-mono font-bold" style={{ color: "var(--accent-green)" }}>
+                    <span className="text-right text-sm font-mono font-bold" style={{ color: "var(--accent-primary)" }}>
                       {formatNumber(getDisplayValue(user))}
                     </span>
                     <span className="text-right text-sm font-mono" style={{ color: "var(--text-secondary)" }}>
@@ -229,15 +231,15 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
       )}
 
       {/* Community summary */}
-      <div className="mt-8 grid grid-cols-4 rounded-xl" style={{ background: "var(--bg-surface)" }}>
+      <div className="mt-8 grid grid-cols-4 rounded-xl" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", boxShadow: "var(--shadow-card)" }}>
         {[
-          { label: "Community Tokens", value: communityStats.tokens, green: true },
+          { label: "Community Tokens", value: communityStats.tokens, teal: true },
           { label: "Active Builders", value: communityStats.builders },
           { label: "Projects Shipped", value: communityStats.shipped },
           { label: "Total Downloads", value: communityStats.downloads },
         ].map((stat) => (
           <div key={stat.label} className="px-4 py-4 text-center">
-            <div className="text-lg font-bold font-mono" style={{ color: stat.green ? "var(--accent-green)" : "var(--text-primary)" }}>
+            <div className="text-lg font-bold font-mono" style={{ color: stat.teal ? "var(--accent-primary)" : "var(--text-primary)" }}>
               {formatNumber(stat.value)}
             </div>
             <div className="mt-0.5 text-[9px] font-medium uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>

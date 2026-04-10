@@ -66,18 +66,18 @@ export default function FollowListModal({ profileId, mode, onClose, onUserClick 
   return (
     <div
       className="fixed inset-0 z-[1000] flex items-center justify-center"
-      style={{ background: "rgba(0,0,0,0.7)" }}
+      style={{ background: "rgba(15, 23, 42, 0.4)" }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
         className="relative w-full max-w-[400px] max-h-[70vh] flex flex-col rounded-2xl"
-        style={{ background: "var(--bg-deep)", border: "1px solid var(--border-ice)" }}
+        style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", boxShadow: "var(--shadow-lg)" }}
       >
         <div className="flex items-center justify-between p-5 pb-0">
           <h2 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
             {mode === "followers" ? "Followers" : "Following"}
           </h2>
-          <button onClick={onClose} style={{ color: "var(--text-secondary)" }}>
+          <button onClick={onClose} style={{ color: "var(--text-muted)" }}>
             <X size={18} />
           </button>
         </div>
@@ -109,7 +109,7 @@ export default function FollowListModal({ profileId, mode, onClose, onUserClick 
                     <div className="text-sm font-semibold truncate" style={{ color: "var(--text-primary)" }}>
                       {user.display_name || user.username}
                     </div>
-                    <div className="text-xs font-mono truncate" style={{ color: "var(--text-secondary)" }}>
+                    <div className="text-xs font-mono truncate" style={{ color: "var(--text-muted)" }}>
                       @{user.username}
                     </div>
                   </div>
