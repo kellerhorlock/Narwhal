@@ -157,7 +157,7 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
                       {displayName}
                       {actualRank === 0 && <NarwhalIcon size={20} style={{ color: "var(--accent-primary)" }} />}
                     </span>
-                    <span className="text-sm font-mono font-bold" style={{ color: "var(--accent-primary)" }}>
+                    <span className="text-sm font-mono font-semibold" style={{ color: "var(--accent-primary)" }}>
                       {formatNumber(getDisplayValue(user))}
                     </span>
                     <span className="text-[10px] uppercase" style={{ color: "var(--text-muted)" }}>{valueLabel}</span>
@@ -213,7 +213,7 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
                         <div className="text-xs font-mono truncate" style={{ color: "var(--text-secondary)" }}>@{user.username}</div>
                       </div>
                     </div>
-                    <span className="text-right text-sm font-mono font-bold" style={{ color: "var(--accent-primary)" }}>
+                    <span className="text-right text-sm font-mono font-semibold" style={{ color: "var(--accent-primary)" }}>
                       {formatNumber(getDisplayValue(user))}
                     </span>
                     <span className="text-right text-sm font-mono" style={{ color: "var(--text-secondary)" }}>
@@ -239,7 +239,7 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
           { label: "Total Downloads", value: communityStats.downloads },
         ].map((stat) => (
           <div key={stat.label} className="px-4 py-4 text-center">
-            <div className="text-lg font-bold font-mono" style={{ color: stat.teal ? "var(--accent-primary)" : "var(--text-primary)" }}>
+            <div className="text-lg font-semibold font-mono" style={{ color: stat.teal ? "var(--accent-primary)" : "var(--text-primary)" }}>
               {formatNumber(stat.value)}
             </div>
             <div className="mt-0.5 text-[9px] font-medium uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>

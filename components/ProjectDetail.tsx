@@ -99,7 +99,7 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
 
       {/* Name + badge + visibility */}
       <div className="flex items-center gap-3 mb-3 flex-wrap">
-        <h1 className="text-[28px] font-bold" style={{ color: "var(--text-primary)" }}>{project.name}</h1>
+        <h1 className="text-[28px] font-semibold" style={{ color: "var(--text-primary)" }}>{project.name}</h1>
         <span
           className="rounded-full px-3 py-1 text-xs font-semibold"
           style={
@@ -188,7 +188,7 @@ export default function ProjectDetail({ project: initialProject, profile, isOwne
         <div className="grid grid-cols-4 gap-3 mb-6">
           {visibleStats.map((stat) => (
             <div key={stat.key} className="rounded-lg px-4 py-3 text-center" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", boxShadow: "var(--shadow-card)" }}>
-              <div className="text-[18px] font-bold font-mono" style={{ color: stat.teal ? "var(--accent-primary)" : "var(--text-primary)" }}>
+              <div className="text-[18px] font-semibold font-mono" style={{ color: stat.teal ? "var(--accent-primary)" : "var(--text-primary)" }}>
                 {stat.display ? stat.display : (stat.value ? formatNumber(stat.value) : "\u2014")}
               </div>
               <div className="mt-0.5 text-[9px] font-medium uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>

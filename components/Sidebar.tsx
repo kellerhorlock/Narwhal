@@ -131,19 +131,19 @@ export default function Sidebar({ activeTab, onTabChange, profile, publishedCoun
           {score && score.total > 0 && !isNaN(score.total) && <div className="mb-1" />}
           <div className="grid grid-cols-3 gap-2 text-center mt-2">
             <div>
-              <div className="text-[13px] font-bold font-mono" style={{ color: "var(--accent-primary)" }}>
+              <div className="text-[13px] font-semibold font-mono" style={{ color: "var(--accent-primary)" }}>
                 {statDisplay(estimatedTokens)}
               </div>
               <div className="text-[9px] uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Tokens</div>
             </div>
             <div>
-              <div className="text-[13px] font-bold font-mono" style={{ color: "var(--text-primary)" }}>
+              <div className="text-[13px] font-semibold font-mono" style={{ color: "var(--text-primary)" }}>
                 {statDisplay(profile.streak_days, "d")}
               </div>
               <div className="text-[9px] uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Streak</div>
             </div>
             <div>
-              <div className="text-[13px] font-bold font-mono" style={{ color: "var(--text-primary)" }}>
+              <div className="text-[13px] font-semibold font-mono" style={{ color: "var(--text-primary)" }}>
                 {statDisplay(profile.hours_this_month, "h")}
               </div>
               <div className="text-[9px] uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Hours</div>

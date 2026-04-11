@@ -4,8 +4,8 @@ import type { NewsEntry } from "@/lib/ai-news-feed";
 import { ExternalLink } from "lucide-react";
 
 const categoryBorders: Record<string, string> = {
-  "Frontier": "#dc2626",
-  "Model Release": "#0e7490",
+  "Frontier": "#FF0083",
+  "Model Release": "#FF0083",
   "Vibe Coding": "#059669",
   "Industry": "#ea580c",
   "Culture": "#9333ea",
@@ -13,7 +13,7 @@ const categoryBorders: Record<string, string> = {
 };
 
 const categoryPills: Record<string, { bg: string; color: string }> = {
-  "Frontier": { bg: "rgba(220,38,38,0.08)", color: "#dc2626" },
+  "Frontier": { bg: "var(--accent-primary-light)", color: "var(--accent-primary)" },
   "Model Release": { bg: "var(--accent-primary-light)", color: "var(--accent-primary)" },
   "Vibe Coding": { bg: "rgba(5,150,105,0.08)", color: "#059669" },
   "Industry": { bg: "rgba(234,88,12,0.08)", color: "#ea580c" },

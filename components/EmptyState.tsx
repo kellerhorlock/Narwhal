@@ -12,7 +12,7 @@ export default function EmptyState({ title, message, actions }: EmptyStateProps)
   return (
     <div className="rounded-xl py-20 px-8 text-center" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", boxShadow: "var(--shadow-card)" }}>
       <NarwhalIcon size={64} className="mx-auto mb-5" style={{ color: "var(--text-muted)" }} animate="float" />
-      <p className="text-[20px] font-bold mb-2" style={{ color: "var(--text-primary)" }}>{title}</p>
+      <p className="text-[20px] font-semibold mb-2" style={{ color: "var(--text-primary)" }}>{title}</p>
       <p className="text-sm mb-8 max-w-sm mx-auto" style={{ color: "var(--text-secondary)" }}>{message}</p>
       {actions && actions.length > 0 && (
         <div className="flex items-center justify-center gap-3">

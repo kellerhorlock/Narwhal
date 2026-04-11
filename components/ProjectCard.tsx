@@ -86,7 +86,7 @@ export default function ProjectCard({ project, onClick, onContextMenu, isStealth
 
       {/* Bottom-left: name + stat */}
       <div className="absolute bottom-0 left-0 p-5 z-20 max-w-[75%]">
-        <h3 className="text-[18px] font-bold leading-tight" style={{ color: "#ffffff" }}>{project.name}</h3>
+        <h3 className="text-[18px] font-semibold leading-tight" style={{ color: "#ffffff" }}>{project.name}</h3>
         {!isStealth && (
           <div className="mt-1.5">
             <span className="text-[12px] font-mono" style={{ color: "rgba(255,255,255,0.5)" }}>{statLine}</span>

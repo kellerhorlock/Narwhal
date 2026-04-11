@@ -43,7 +43,7 @@ export default function SignupPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center" style={{ background: "var(--bg-primary)" }}>
       <NarwhalIcon size={60} style={{ color: "var(--text-primary)" }} className="mb-5" animate="fade-in" />
-      <h1 className="mb-8 text-3xl font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>Join Narwhal</h1>
+      <h1 className="mb-8 text-3xl font-semibold tracking-tight" style={{ color: "var(--text-primary)" }}>Join Narwhal</h1>
       <form onSubmit={handleSignup} className="flex w-full max-w-sm flex-col gap-4">
         <input
           type="text"

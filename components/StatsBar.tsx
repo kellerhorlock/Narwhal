@@ -37,7 +37,7 @@ export default function StatsBar({ stats }: StatsBarProps) {
       {stats.map((stat) => (
         <div key={stat.label} className="px-4 py-3.5 text-center">
           <div
-            className={`text-lg font-bold ${stat.mono ? "font-mono" : ""}`}
+            className={`text-lg font-semibold ${stat.mono ? "font-mono" : ""}`}
             style={{ color: stat.green ? "var(--accent-primary)" : "var(--text-primary)" }}
           >
             {renderValue(stat.value)}

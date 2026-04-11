@@ -186,7 +186,7 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
         <Avatar name={displayName} size={72} />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3 flex-wrap">
-            <h2 className="text-[28px] font-bold" style={{ color: "var(--text-primary)" }}>{displayName}</h2>
+            <h2 className="text-[28px] font-semibold" style={{ color: "var(--text-primary)" }}>{displayName}</h2>
             <BuilderScoreBadge score={score.total} percentile={percentile} size="lg" />
             {streakDays >= 7 && (
               <span className="rounded-full px-2.5 py-1 text-xs font-semibold" style={{ background: "rgba(245, 158, 11, 0.1)", color: "var(--accent-warm)" }}>
@@ -332,7 +332,7 @@ export default function ProfileView({ username, currentUserId, onProjectClick, o
           onClick={(e) => { if (e.target === e.currentTarget) setDeleteProject(null); }}
         >
           <div className="rounded-2xl p-6 max-w-[380px] w-full" style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", boxShadow: "var(--shadow-lg)" }}>
-            <h3 className="text-lg font-bold mb-2" style={{ color: "var(--text-primary)" }}>Delete Project</h3>
+            <h3 className="text-lg font-semibold mb-2" style={{ color: "var(--text-primary)" }}>Delete Project</h3>
             <p className="text-sm mb-5" style={{ color: "var(--text-secondary)" }}>
               Are you sure you want to delete <strong style={{ color: "var(--text-primary)" }}>{deleteProject.name}</strong>? This cannot be undone.
             </p>

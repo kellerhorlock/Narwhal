@@ -91,7 +91,7 @@ function Stat({ label, value, teal, mono, onClick }: { label: string; value: num
   const content = (
     <>
       <div
-        className={`text-[20px] font-bold ${mono ? "font-mono" : ""}`}
+        className={`text-[20px] font-semibold ${mono ? "font-mono" : ""}`}
         style={{ color: teal ? "var(--accent-primary)" : "var(--text-primary)" }}
       >
         {renderVal(value)}

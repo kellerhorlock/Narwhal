@@ -179,7 +179,7 @@ export default function SearchView({ onProjectClick, onUserClick }: SearchViewPr
                 onClick={() => handleTagClick(tag)}
                 className="flex-shrink-0 rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors duration-150"
                 style={activeTag === tag
-                  ? { background: "var(--accent-primary-light)", color: "var(--accent-primary)", border: "1px solid rgba(14,116,144,0.2)" }
+                  ? { background: "var(--accent-primary-light)", color: "var(--accent-primary)", border: "1px solid rgba(255,0,131,0.2)" }
                   : { border: "1px solid var(--border-default)", color: "var(--text-secondary)" }
                 }
               >

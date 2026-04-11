@@ -2,13 +2,13 @@
 
 @theme inline {
   --color-background: #f8fafb;
-  --color-foreground: #0f1419;
+  --color-foreground: #000000;
   --color-muted: #8899a6;
-  --color-accent: #0e7490;
+  --color-accent: #FF0083;
   --color-card: #ffffff;
   --color-card-hover: #e8eef3;
   --color-border: #e1e8ed;
-  --font-sans: var(--font-inter);
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
   --font-mono: var(--font-jetbrains);
   --font-serif: var(--font-instrument);
 }
@@ -22,7 +22,7 @@
   --bg-input: #f3f6f9;
 
   /* Text */
-  --text-primary: #0f1419;
+  --text-primary: #000000;
   --text-secondary: #536471;
   --text-muted: #8899a6;
   --text-inverse: #ffffff;
@@ -33,9 +33,9 @@
   --border-strong: #aab8c2;
 
   /* Accents */
-  --accent-primary: #0e7490;
-  --accent-primary-light: #e0f7fa;
-  --accent-primary-hover: #0c6680;
+  --accent-primary: #FF0083;
+  --accent-primary-light: #fff0f6;
+  --accent-primary-hover: #e00074;
   --accent-secondary: #1e40af;
   --accent-warm: #ea580c;
   --accent-success: #059669;
@@ -58,7 +58,7 @@
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
-  font-family: 'Inter', -apple-system, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
 }
 
 /* Scrollbar — subtle */

@@ -74,7 +74,7 @@ export default function FollowListModal({ profileId, mode, onClose, onUserClick 
         style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", boxShadow: "var(--shadow-lg)" }}
       >
         <div className="flex items-center justify-between p-5 pb-0">
-          <h2 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
+          <h2 className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
             {mode === "followers" ? "Followers" : "Following"}
           </h2>
           <button onClick={onClose} style={{ color: "var(--text-muted)" }}>

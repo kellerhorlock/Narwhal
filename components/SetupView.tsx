@@ -190,7 +190,7 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
 
   return (
     <div>
-      <div className="mb-6" style={{ filter: "drop-shadow(0 0 20px rgba(14,116,144,0.15))" }}>
+      <div className="mb-6" style={{ filter: "drop-shadow(0 0 20px rgba(255,0,131,0.15))" }}>
         <NarwhalIcon size={80} style={{ color: "var(--text-primary)" }} animate="fade-in" />
       </div>
       <h1 className="font-serif italic text-3xl mb-2" style={{ color: "var(--text-primary)" }}>
@@ -225,7 +225,7 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
             onClick={handleCopy}
             className="w-full flex items-center justify-center gap-2.5 rounded-xl py-3.5 text-sm font-semibold transition-all duration-200 mb-4"
             style={copied
-              ? { background: "var(--accent-primary-light)", border: "1px solid rgba(14,116,144,0.2)", color: "var(--accent-primary)" }
+              ? { background: "var(--accent-primary-light)", border: "1px solid rgba(255,0,131,0.2)", color: "var(--accent-primary)" }
               : { background: "var(--accent-primary)", color: "var(--text-inverse)" }
             }
           >
@@ -269,7 +269,7 @@ Profile live at narwhal.codes. Every commit auto-syncs. All stats derived from c
             onClick={handleCopy}
             className="w-full flex items-center justify-center gap-2.5 rounded-xl py-3.5 text-sm font-semibold transition-all duration-200"
             style={copied
-              ? { background: "var(--accent-primary-light)", border: "1px solid rgba(14,116,144,0.2)", color: "var(--accent-primary)" }
+              ? { background: "var(--accent-primary-light)", border: "1px solid rgba(255,0,131,0.2)", color: "var(--accent-primary)" }
               : { background: "var(--accent-primary)", color: "var(--text-inverse)" }
             }
           >

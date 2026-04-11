@@ -113,7 +113,7 @@ export default function EditProjectModal({ project, onClose, onSaved }: EditProj
           <X size={20} />
         </button>
 
-        <h2 className="text-xl font-bold mb-5" style={{ color: "var(--text-primary)" }}>Edit Project</h2>
+        <h2 className="text-xl font-semibold mb-5" style={{ color: "var(--text-primary)" }}>Edit Project</h2>
 
         {/* Image section */}
         <div className="mb-5">

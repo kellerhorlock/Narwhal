@@ -26,7 +26,7 @@ export default function Avatar({ name, size = 40, showRing = false }: AvatarProp
         color: "#ffffff",
         background: getAvatarGradient(name),
         border: "2px solid #ffffff",
-        boxShadow: showRing ? "0 0 20px rgba(14,116,144,0.15)" : "var(--shadow-sm)",
+        boxShadow: showRing ? "0 0 20px rgba(255,0,131,0.15)" : "var(--shadow-sm)",
       }}
     >
       <span className="relative z-10">{initials}</span>
