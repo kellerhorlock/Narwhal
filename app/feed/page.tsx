@@ -128,7 +128,7 @@ export default function FeedPage() {
       const myProjects = (userProjects || []).filter((p) => p.user_id === currentUserId);
       setUserPublishedCount(myProjects.filter((p) => p.status === "published").length);
       setUserTotalDownloads(myProjects.reduce((s, p) => s + (p.downloads || 0), 0));
-      setUserEstimatedTokens(myProjects.reduce((s, p) => s + (p.commits || 0) * 14777, 0));
+      setUserEstimatedTokens(myProjects.reduce((s, p) => s + Math.round((p.commits || 0) * 14777 * 7.17), 0));
       setAllDownloads((userProjects || []).map((p) => p.downloads || 0));
 
       // Load following feed: all activity from followed users (last 7 days, not stealth)

@@ -79,7 +79,7 @@ export default function HumanMachineStats({
           <Stat label="Tokens" value={totalCommits > 0 ? formatTokens(totalCommits) : null} teal mono />
           <Stat label="Total Commits" value={totalCommits} mono />
           <Stat label="Est. Lines" value={stats.linesOfCode} mono />
-          <Stat label="Avg Tokens/Commit" value={totalCommits > 0 ? "14.8K" : null} mono />
+          <Stat label="Avg Tokens/Commit" value={totalCommits > 0 ? "105.9K" : null} mono />
           <Stat label="Projects" value={projectCount} mono />
         </div>
       </div>

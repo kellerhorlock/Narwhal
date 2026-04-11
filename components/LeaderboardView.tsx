@@ -45,7 +45,7 @@ export default function LeaderboardView({ currentUserId, onUserClick, onTabChang
       for (const p of projects || []) {
         if (p.status === "published") pub[p.user_id] = (pub[p.user_id] || 0) + 1;
         dl[p.user_id] = (dl[p.user_id] || 0) + (p.downloads || 0);
-        userTokensFromProjects[p.user_id] = (userTokensFromProjects[p.user_id] || 0) + (p.commits || 0) * 14777;
+        userTokensFromProjects[p.user_id] = (userTokensFromProjects[p.user_id] || 0) + Math.round((p.commits || 0) * 14777 * 7.17);
       }
       setUserPublished(pub);
       setUserDownloads(dl);
